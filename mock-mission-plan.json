@@ -1,0 +1,270 @@
+{
+  "veteranName": "James Rodriguez",
+  "etsDate": "2025-08-15",
+  "overview": "Your transition plan focuses on career development with a strong emphasis on translating your infantry leadership experience into corporate management roles. With 269 days until ETS and plans to file for VA disability, we've prioritized healthcare enrollment, claims preparation, and aggressive job search activities.",
+  "tasks": [
+    {
+      "id": "task-1",
+      "title": "Schedule TAP (Transition Assistance Program) counseling",
+      "description": "Contact your installation's transition office to schedule mandatory TAP counseling at least 90 days before ETS. This comprehensive program covers resume writing, interview skills, VA benefits, and civilian job market preparation. Bring your spouse if married.",
+      "category": "admin",
+      "deadline": "2025-05-17",
+      "priority": "high",
+      "completed": false,
+      "steps": [
+        "Locate your installation's Transition Assistance Program (TAP) office or call your Human Resources office for contact information.",
+        "Call or visit the TAP office to inquire about available counseling sessions and schedule an appointment at least 90 days before your ETS date.",
+        "Confirm the session date, time, and location, and ask if your spouse is welcome to attend.",
+        "Prepare a list of questions about resume writing, interview preparation, and VA benefits.",
+        "Attend the scheduled TAP counseling session and take notes on key information provided."
+      ]
+    },
+    {
+      "id": "task-2",
+      "title": "Request certified copy of DD-214 upon separation",
+      "description": "Ensure you receive multiple certified copies of your DD Form 214 (Member 4 copy) at separation. This document is essential for VA benefits, employment verification, and accessing veteran services. Keep originals in a safe place and have digital copies backed up.",
+      "category": "admin",
+      "deadline": "2025-08-15",
+      "priority": "high",
+      "completed": false,
+      "steps": [
+        "Contact your installation's Personnel or Human Resources office to request multiple certified copies of your DD-214 form (Member 4 copy).",
+        "Request at least 5 certified copies to ensure you have extras for VA benefits, employment, and personal records.",
+        "Confirm the copies will be provided on or before your ETS date.",
+        "Upon receipt, verify all information on the DD-214 is accurate (dates, MOS, awards, characterization of service).",
+        "Scan the certified copies and save digital versions to cloud storage and an external hard drive for backup."
+      ]
+    },
+    {
+      "id": "task-3",
+      "title": "Enroll in VA healthcare before ETS date",
+      "description": "Apply for VA healthcare online at VA.gov or visit your nearest VA medical center. Enrollment within one year of separation ensures you maintain continuous healthcare coverage. Complete application at least 30 days before ETS to avoid gaps.",
+      "category": "healthcare",
+      "deadline": "2025-07-15",
+      "priority": "high",
+      "completed": false,
+      "steps": [
+        "Visit VA.gov and navigate to the 'Health Care' section.",
+        "Click 'Apply for VA Health Care' and select 'Apply Now' to start the online application.",
+        "Log in with your VA.gov account (create one if needed using your email and Social Security number).",
+        "Complete the VA Form 10-10EZ, providing your military service information, current health status, and contact details.",
+        "Submit the application and note the confirmation number for your records.",
+        "Within 2-3 weeks, the VA will contact you with enrollment information and your assigned medical facility."
+      ]
+    },
+    {
+      "id": "task-4",
+      "title": "Gather documentation for VA disability claim",
+      "description": "Collect service medical records, deployment documentation, performance evaluations, and buddy statements supporting your claimed conditions. Request your complete military medical records through milConnect or eBenefits. Schedule a final separation physical and document all service-connected issues with your provider.",
+      "category": "healthcare",
+      "deadline": "2025-06-15",
+      "priority": "high",
+      "completed": false,
+      "steps": [
+        "Log in to milConnect or eBenefits and request your complete military medical records (DD Form 180).",
+        "Contact your unit's medical officer to schedule a final separation physical and request documentation of any service-related injuries or conditions.",
+        "Gather deployment documentation, including dates, locations, and any combat-related incidents.",
+        "Collect performance evaluations and any incident reports that document service-connected conditions.",
+        "Reach out to 3-5 fellow service members who can provide buddy statements supporting your claimed conditions.",
+        "Organize all documents in a folder and create a checklist to ensure nothing is missing before filing your claim."
+      ]
+    },
+    {
+      "id": "task-5",
+      "title": "File VA disability claim (Intent to File)",
+      "description": "Submit an Intent to File (ITF) form on VA.gov immediately to establish your effective date for benefits. This preserves your filing date while you gather supporting documentation. Complete the full claim submission within 12 months of ITF. Consider working with a VSO (Veterans Service Organization) for free claim assistance.",
+      "category": "healthcare",
+      "deadline": "2025-04-15",
+      "priority": "high",
+      "completed": false,
+      "steps": [
+        "Visit VA.gov and navigate to 'File a Claim for Disability Compensation'.",
+        "Select 'File an Intent to File (ITF)' to establish your effective date.",
+        "Log in with your VA.gov account and provide your military service information.",
+        "List the conditions you believe are service-connected (you can add more details later).",
+        "Submit the ITF form and save the confirmation number.",
+        "Begin gathering supporting documentation and schedule a consultation with a Veterans Service Officer (VSO) for free claim assistance."
+      ]
+    },
+    {
+      "id": "task-6",
+      "title": "Create targeted civilian resume highlighting infantry leadership",
+      "description": "Translate your Army 11B experience into civilian language. Emphasize team leadership (managed squads of 9+ personnel), risk management, logistics coordination, training development, and performance under pressure. Use metrics: number of soldiers led, operations completed, safety records. Tailor to operations manager, supply chain supervisor, or logistics coordinator roles.",
+      "category": "career",
+      "deadline": "2025-04-30",
+      "priority": "high",
+      "completed": false,
+      "steps": [
+        "List your military roles and responsibilities, translating military terminology into civilian language (e.g., 'Infantry Platoon Sergeant' → 'Operations Team Lead').",
+        "Quantify your accomplishments with metrics: number of personnel managed, operations completed, safety records, training programs developed.",
+        "Use action verbs like 'led', 'managed', 'coordinated', 'implemented', and 'improved' to describe your experience.",
+        "Create a professional resume format with clear sections: Summary, Experience, Education, Skills, and Certifications.",
+        "Tailor your resume for specific job postings in operations management, supply chain, or logistics coordinator roles.",
+        "Have a mentor or career counselor review your resume for clarity and impact."
+      ]
+    },
+    {
+      "id": "task-7",
+      "title": "Optimize LinkedIn profile for corporate recruiters",
+      "description": "Update LinkedIn headline to reflect target civilian role (e.g., 'Infantry Platoon Sergeant transitioning to Operations Management | Leadership | Process Improvement'). Add professional photo, detailed experience section using civilian terminology, request recommendations from supervisors, and connect with 50+ professionals in your target industry. Join LinkedIn groups related to veteran employment and your career field.",
+      "category": "career",
+      "deadline": "2025-05-15",
+      "priority": "high",
+      "completed": false,
+      "steps": [
+        "Log in to LinkedIn and upload a professional headshot photo (clear, well-lit, professional attire).",
+        "Update your headline to reflect your target role: 'Infantry Platoon Sergeant transitioning to Operations Management | Leadership | Process Improvement'.",
+        "Rewrite your 'About' section to highlight your transition story and target civilian roles.",
+        "Update your experience section with civilian terminology and quantified accomplishments.",
+        "Request 5-10 recommendations from former supervisors, peers, and colleagues.",
+        "Connect with 50+ professionals in operations management, supply chain, and logistics fields.",
+        "Join 5-10 LinkedIn groups focused on veteran employment and your target industry."
+      ]
+    },
+    {
+      "id": "task-8",
+      "title": "Apply to 15+ positions through veteran hiring programs",
+      "description": "Target companies with strong veteran hiring initiatives: Amazon (Military Talent Program), Union Pacific Railroad, JPMorgan Chase Veterans Program, Walmart, Schneider Logistics. Use Hiring Our Heroes, RecruitMilitary, and LinkedIn's veteran job filters. Apply to operations manager, warehouse supervisor, and logistics coordinator positions. Leverage military skills preference on USAJobs.gov.",
+      "category": "career",
+      "deadline": "2025-06-30",
+      "priority": "high",
+      "completed": false,
+      "steps": [
+        "Visit veteran job boards: Hiring Our Heroes, RecruitMilitary, LinkedIn (filter by 'Veteran Friendly'), and USAJobs.gov.",
+        "Search for operations manager, warehouse supervisor, and logistics coordinator positions.",
+        "Identify 15+ positions that match your skills and target role.",
+        "Customize your resume and cover letter for each application, highlighting relevant military experience.",
+        "Submit applications through company websites and job boards.",
+        "Track your applications in a spreadsheet with company name, position, date applied, and follow-up date.",
+        "Follow up with recruiters 1-2 weeks after applying if you don't hear back."
+      ]
+    },
+    {
+      "id": "task-9",
+      "title": "Attend 3 veteran networking events in Austin, TX",
+      "description": "Connect with Austin veteran community through events hosted by Hiring Our Heroes, American Corporate Partners, and local VFW/American Legion chapters. These events provide mentorship, job leads, and peer support. Register for Austin Veteran Business Conference and monthly networking mixers at local breweries.",
+      "category": "career",
+      "deadline": "2025-07-30",
+      "priority": "medium",
+      "completed": false,
+      "steps": [
+        "Search for veteran networking events in Austin through Hiring Our Heroes, American Corporate Partners, and local VFW/American Legion websites.",
+        "Identify 3-5 upcoming events and register in advance.",
+        "Prepare an elevator pitch about your background and target role.",
+        "Print business cards with your contact information.",
+        "Attend the events and connect with at least 5 people at each event.",
+        "Follow up with new contacts via LinkedIn or email within 48 hours.",
+        "Document any job leads or mentorship opportunities for future follow-up."
+      ]
+    },
+    {
+      "id": "task-10",
+      "title": "Research VA Home Loan Lenders in Orlando, FL",
+      "description": "Identify and contact VA-approved home loan lenders in Orlando to get pre-qualified for a VA home loan. This will help in understanding your budget for home purchases.",
+      "category": "housing",
+      "deadline": "2025-05-19",
+      "priority": "high",
+      "completed": false,
+      "steps": [
+        "Visit the VA.gov website and use the VA Home Loan Calculator (https://www.va.gov/housing-assistance/home-loans/loan-calculator/) to determine your estimated loan amount and monthly payment.",
+        "Search for VA-approved lenders in Orlando using the VA Lender Search tool on VA.gov or by searching 'VA-approved mortgage lenders Orlando, FL'.",
+        "Contact 3-5 VA-approved lenders and request pre-qualification or pre-approval letters (this is free and doesn't affect your credit score).",
+        "Compare interest rates, fees, and terms offered by different lenders.",
+        "Ask each lender about VA-specific benefits, such as no down payment, no PMI (private mortgage insurance), and funding fees.",
+        "Save the pre-qualification letters and lender contact information for future reference."
+      ]
+    },
+    {
+      "id": "task-10b",
+      "title": "Start Housing Search in Orlando, FL",
+      "description": "Begin the search for suitable housing options in Orlando, using real estate websites, VA housing assistance programs, and local agents familiar with veteran needs.",
+      "category": "housing",
+      "deadline": "2026-01-04",
+      "priority": "medium",
+      "completed": false,
+      "steps": [
+        "Create a list of 3-5 neighborhoods in Orlando that interest you (consider proximity to your job, VA medical center, schools, and veteran community).",
+        "Visit housing search platforms: Zillow.com, Apartments.com, Rent.com, and Realtor.com to browse available properties.",
+        "Filter searches by your pre-approved VA loan amount or rental budget.",
+        "Compare estimated rent/mortgage + utilities costs for each neighborhood using cost-of-living calculators.",
+        "Save listings of 10-15 properties that match your criteria and budget.",
+        "Contact local real estate agents who specialize in working with veterans or have VA loan experience.",
+        "Schedule virtual or in-person tours of your top 5 properties."
+      ]
+    },
+    {
+      "id": "task-10c",
+      "title": "Plan Relocation to Orlando, FL",
+      "description": "Organize logistics for relocating to Orlando, including packing, transportation of belongings, and setting up utilities at the new residence.",
+      "category": "housing",
+      "deadline": "2026-01-09",
+      "priority": "medium",
+      "completed": false,
+      "steps": [
+        "Obtain moving quotes from 3-5 professional moving companies or research DIY moving options (U-Haul, Penske, Home Depot rentals).",
+        "Decide between hiring professional movers or DIY moving based on cost and timeline.",
+        "Plan your driving route from your current location to Orlando using Google Maps or similar tools.",
+        "Schedule your move date and confirm with your moving company or reserve your rental truck.",
+        "Contact utility providers (electricity, water, gas, internet) in Orlando and schedule setup for your move-in date.",
+        "Create a moving checklist including items to pack, forward address with USPS, and notify important contacts (VA, employer, banks).",
+        "Arrange temporary housing if needed between your current location and Orlando (hotels, Airbnb, or staying with friends/family)."
+      ]
+    },
+    {
+      "id": "task-11",
+      "title": "Create 90-day post-ETS transition budget",
+      "description": "Calculate monthly expenses including housing, utilities, healthcare (until VA coverage activates), transportation, food, and emergency fund. Account for potential gap between ETS and first civilian paycheck. Set aside 3-6 months expenses if possible. Use Military OneSource financial counseling (free) to review budget and create savings plan.",
+      "category": "finance",
+      "deadline": "2025-06-15",
+      "priority": "medium",
+      "completed": false,
+      "steps": [
+        "List all monthly expenses: housing, utilities, transportation, food, insurance, phone, internet, and childcare.",
+        "Research average costs for your target location (Austin, TX).",
+        "Calculate your total monthly expenses and multiply by 3-6 months to determine your emergency fund target.",
+        "Account for the gap between ETS and your first civilian paycheck (estimate 1-3 months).",
+        "Contact Military OneSource for free financial counseling to review your budget.",
+        "Create a savings plan to reach your emergency fund goal before ETS.",
+        "Document your budget in a spreadsheet and review it monthly."
+      ]
+    },
+    {
+      "id": "task-12",
+      "title": "Schedule informational interviews with 5 veterans in target career field",
+      "description": "Reach out via LinkedIn to veterans working in operations, logistics, or supply chain management. Request 20-minute phone calls to learn about their transition experience, company culture, and advice for breaking into the field. Prepare questions about civilian workplace differences, salary expectations, and certification requirements.",
+      "category": "career",
+      "deadline": "2025-06-01",
+      "priority": "low",
+      "completed": false,
+      "steps": [
+        "Search LinkedIn for veterans working in operations management, logistics, or supply chain roles.",
+        "Identify 10-15 potential contacts and review their profiles.",
+        "Send personalized connection requests mentioning your transition and interest in their career path.",
+        "Once connected, send a message requesting a 20-minute informational interview.",
+        "Prepare questions about their transition experience, company culture, salary expectations, and required certifications.",
+        "Schedule calls at times convenient for them (offer flexibility).",
+        "During the interview, take notes and ask follow-up questions.",
+        "Send thank-you emails after each call and stay in touch for future networking."
+      ]
+    },
+    {
+      "id": "task-13",
+      "title": "Connect with Local Veteran Resources in Orlando",
+      "description": "Reach out to veteran support organizations in Orlando, such as the Orlando VA Medical Center and local VFW posts, to establish a network and access community resources.",
+      "category": "wellness",
+      "deadline": "2026-01-14",
+      "priority": "medium",
+      "completed": false,
+      "steps": [
+        "Search online for the Orlando VA Medical Center and save its main phone number (407-646-1500) and address to your contacts.",
+        "Visit the VA.gov facility locator (https://www.va.gov/find-locations/) to find VA clinics and Vet Centers near Orlando.",
+        "Search for local VFW (Veterans of Foreign Wars) posts in Orlando using the VFW post locator on vfw.org.",
+        "Search for local American Legion chapters in Orlando using the American Legion website (legion.org).",
+        "Research other veteran support organizations such as Team RWB (Team Red White & Blue), Wounded Warrior Project, and local veteran nonprofits in Orlando.",
+        "Save contact information (phone numbers, addresses, websites) for at least 5-7 veteran organizations in a document or phone contacts.",
+        "Attend at least one meeting or event at a VFW post or American Legion chapter to meet other veterans and learn about available resources."
+      ]
+    }
+  ],
+  "generatedAt": "2025-01-15T14:32:00.000Z"
+}
