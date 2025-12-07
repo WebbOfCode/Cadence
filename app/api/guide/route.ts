@@ -4,10 +4,6 @@ import { z } from 'zod';
 import { onboardingSchema, missionPlanSchema } from '@/lib/schemas';
 import type { MissionPlan, MissionTask } from '@/lib/types';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function POST(req: NextRequest) {
   try {
     // Check if API key is configured
@@ -18,6 +14,11 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Initialize OpenAI client with validated API key
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
 
     const body = await req.json();
     
