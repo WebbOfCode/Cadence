@@ -15,6 +15,7 @@ interface OnboardingStore {
   setMissionPlan: (plan: MissionPlan) => void;
   updateTaskCompletion: (taskId: string, completed: boolean) => void;
   updateTask: (taskId: string, updates: Partial<MissionTask>) => void;
+  toggleStepCompletion: (taskId: string, stepIndex: number) => void;
   
   reset: () => void;
 }
@@ -61,6 +62,22 @@ export const useOnboardingStore = create<OnboardingStore>()(
           tasks: state.missionPlan.tasks.map((task) =>
             task.id === taskId ? { ...task, ...updates } : task
           ),
+        } : null,
+      })),
+      
+      toggleStepCompletion: (taskId, stepIndex) => set((state) => ({
+        missionPlan: state.missionPlan ? {
+          ...state.missionPlan,
+          tasks: state.missionPlan.tasks.map((task) => {
+            if (task.id === taskId) {
+              const stepsCompleted = task.stepsCompleted || [];
+              const newStepsCompleted = stepsCompleted.includes(stepIndex)
+                ? stepsCompleted.filter(i => i !== stepIndex)
+                : [...stepsCompleted, stepIndex];
+              return { ...task, stepsCompleted: newStepsCompleted };
+            }
+            return task;
+          }),
         } : null,
       })),
       

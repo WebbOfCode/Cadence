@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { formatDate } from '@/lib/utils';
 import { X, Edit2, Check } from 'lucide-react';
 import { useOnboardingStore } from '@/lib/useOnboardingStore';
+import { getCategoryIcon, type TaskCategory } from '@/lib/categoryIcons';
 
 interface TaskDetailDrawerProps {
   task: MissionTask | null;
@@ -16,7 +17,7 @@ interface TaskDetailDrawerProps {
 }
 
 export function TaskDetailDrawer({ task, onClose, userMOS, timeInService, dischargeRank }: TaskDetailDrawerProps) {
-  const { updateTask } = useOnboardingStore();
+  const { updateTask, toggleStepCompletion } = useOnboardingStore();
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [noteText, setNoteText] = useState(task?.notes || '');
 
@@ -30,11 +31,11 @@ export function TaskDetailDrawer({ task, onClose, userMOS, timeInService, discha
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-50 text-red-700 border-red-200';
+        return 'bg-red-50 text-red-700 border-red-300';
       case 'medium':
-        return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+        return 'bg-amber-50 text-amber-700 border-amber-300';
       case 'low':
-        return 'bg-green-50 text-green-700 border-green-200';
+        return 'bg-blue-50 text-blue-700 border-blue-300';
       default:
         return 'bg-gray-50 text-gray-700 border-gray-200';
     }
@@ -62,7 +63,11 @@ export function TaskDetailDrawer({ task, onClose, userMOS, timeInService, discha
               <span className={`px-3 py-1 text-xs font-medium rounded border ${getPriorityColor(task.priority)}`}>
                 {task.priority.toUpperCase()}
               </span>
-              <span className="px-3 py-1 text-xs font-medium rounded border bg-gray-100 text-gray-700 border-gray-200">
+              <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded border bg-gray-100 text-gray-700 border-gray-200">
+                {(() => {
+                  const { icon: Icon, color } = getCategoryIcon(task.category as TaskCategory);
+                  return <Icon className={`${color} text-sm`} />;
+                })()}
                 {getCategoryLabel(task.category)}
               </span>
             </div>
@@ -94,12 +99,56 @@ export function TaskDetailDrawer({ task, onClose, userMOS, timeInService, discha
           {task.steps && task.steps.length > 0 && (
             <section>
               <h3 className="text-lg font-bold mb-4">How to Complete This Task</h3>
+              
+              {/* Step Progress */}
+              <div className="mb-4">
+                <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                  <span className="font-medium">
+                    {task.stepsCompleted?.length || 0}/{task.steps.length} steps completed
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  {task.steps.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`h-2 flex-1 rounded-full transition-colors ${
+                        task.stepsCompleted?.includes(index)
+                          ? 'bg-green-500'
+                          : 'bg-gray-200'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+
               <div className="p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
                 <ol className="space-y-3">
                   {task.steps.map((step, stepIndex) => (
                     <li key={stepIndex} className="flex gap-3">
-                      <span className="flex-shrink-0 font-semibold text-blue-600 w-6">{stepIndex + 1}.</span>
-                      <span className="text-gray-700 text-sm leading-relaxed">{step}</span>
+                      <div className="flex-shrink-0 mt-0.5">
+                        <button
+                          onClick={() => toggleStepCompletion(task.id, stepIndex)}
+                          className={`
+                            w-5 h-5 rounded border-2 flex items-center justify-center transition-colors
+                            ${task.stepsCompleted?.includes(stepIndex)
+                              ? 'bg-green-500 border-green-500'
+                              : 'border-gray-400 hover:border-green-500'
+                            }
+                          `}
+                        >
+                          {task.stepsCompleted?.includes(stepIndex) && (
+                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-semibold text-blue-700 mr-2">{stepIndex + 1}.</span>
+                        <span className={`text-gray-700 text-sm leading-relaxed ${task.stepsCompleted?.includes(stepIndex) ? 'line-through opacity-60' : ''}`}>
+                          {step}
+                        </span>
+                      </div>
                     </li>
                   ))}
                 </ol>

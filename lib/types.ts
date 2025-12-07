@@ -57,6 +57,8 @@ export interface MissionTask {
   notes?: string;
   // Steps array for "How to complete" feature - provides actionable steps for task completion
   steps?: string[];
+  // Track which steps have been completed (array of step indices)
+  stepsCompleted?: number[];
   // Core/universal tasks that apply to everyone
   core?: boolean;
 }

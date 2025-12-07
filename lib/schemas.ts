@@ -36,6 +36,7 @@ export const missionTaskSchema = z.object({
   priority: z.enum(['high', 'medium', 'low']),
   completed: z.boolean(),
   steps: z.array(z.string()).optional(),
+  stepsCompleted: z.array(z.number()).optional(),
   notes: z.string().optional(),
   core: z.boolean().optional(),
 });

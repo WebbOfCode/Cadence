@@ -9,6 +9,7 @@ import { formatDate, getDaysUntilETS, getGoalLabel } from '@/lib/utils';
 import type { MissionTask } from '@/lib/types';
 import { TaskDetailDrawer } from './components/TaskDetailDrawer';
 import { EditGoalsModal } from './components/EditGoalsModal';
+import { getCategoryIcon, type TaskCategory } from '@/lib/categoryIcons';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -96,11 +97,11 @@ export default function DashboardPage() {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-100 text-red-700 border-red-300';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-amber-100 text-amber-700 border-amber-300';
       case 'low':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-blue-100 text-blue-700 border-blue-300';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -234,42 +235,45 @@ export default function DashboardPage() {
           <p className="text-lg text-gray-700 leading-relaxed">{missionPlan.overview}</p>
         </motion.div>
 
-        {/* Search Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45 }}
-          className="mb-8"
-        >
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search tasks by title, description, or category..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-6 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
-            />
-          </div>
-        </motion.div>
+        {/* Sticky Filter/Search Bar */}
+        <div className="sticky top-0 z-20 bg-white pb-6 -mx-6 px-6 border-b border-gray-100 mb-8">
+          {/* Search Bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="mb-4"
+          >
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="Search tasks by title, description, or category..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-6 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+              />
+            </div>
+          </motion.div>
 
-        {/* Filter Bar */}
-        <div className="flex gap-3 mb-8 flex-wrap">
-          {(['all', 'high', 'medium', 'low'] as const).map((priority) => (
-            <button
-              key={priority}
-              onClick={() => setFilter(priority)}
-              className={`
-                px-6 py-2 font-medium rounded-lg transition-colors
-                ${filter === priority 
-                  ? 'bg-black text-white' 
-                  : 'border-2 border-gray-200 hover:border-gray-400'
-                }
-              `}
-            >
-              {priority.charAt(0).toUpperCase() + priority.slice(1)}
-            </button>
-          ))}
+          {/* Filter Bar */}
+          <div className="flex gap-3 flex-wrap">
+            {(['all', 'high', 'medium', 'low'] as const).map((priority) => (
+              <button
+                key={priority}
+                onClick={() => setFilter(priority)}
+                className={`
+                  px-6 py-2 font-medium rounded-lg transition-colors
+                  ${filter === priority 
+                    ? 'bg-black text-white' 
+                    : 'border-2 border-gray-200 hover:border-gray-400'
+                  }
+                `}
+              >
+                {priority.charAt(0).toUpperCase() + priority.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Task List */}
@@ -316,13 +320,40 @@ export default function DashboardPage() {
                       <span className={`px-3 py-1 text-xs font-medium rounded border ${getPriorityColor(task.priority)}`}>
                         {task.priority.toUpperCase()}
                       </span>
-                      <span className="px-3 py-1 text-xs font-medium rounded border bg-gray-100 text-gray-700 border-gray-200">
+                      <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded border bg-gray-100 text-gray-700 border-gray-200">
+                        {(() => {
+                          const { icon: Icon, color } = getCategoryIcon(task.category as TaskCategory);
+                          return <Icon className={`${color} text-sm`} />;
+                        })()}
                         {getCategoryLabel(task.category)}
                       </span>
                     </div>
                   </div>
 
                   <p className="text-gray-600 mb-3">{task.description}</p>
+
+                  {/* Step Progress Indicator */}
+                  {task.steps && task.steps.length > 0 && (
+                    <div className="mb-3">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                        <span className="font-medium">
+                          {task.stepsCompleted?.length || 0}/{task.steps.length} steps completed
+                        </span>
+                      </div>
+                      <div className="flex gap-1">
+                        {task.steps.map((_, index) => (
+                          <div
+                            key={index}
+                            className={`h-2 flex-1 rounded-full transition-colors ${
+                              task.stepsCompleted?.includes(index)
+                                ? 'bg-green-500'
+                                : 'bg-gray-200'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {task.deadline && (
                     <p className="text-sm text-gray-500 mb-3">
@@ -347,11 +378,36 @@ export default function DashboardPage() {
                   {expandedStepsTaskId === task.id && task.steps && task.steps.length > 0 && (
                     <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
                       <h4 className="font-semibold text-gray-800 mb-3">How to complete this task:</h4>
-                      <ol className="space-y-2">
+                      <ol className="space-y-3">
                         {task.steps.map((step, stepIndex) => (
                           <li key={stepIndex} className="flex gap-3">
-                            <span className="flex-shrink-0 font-medium text-blue-600 w-6">{stepIndex + 1}.</span>
-                            <span className="text-gray-700">{step}</span>
+                            <div className="flex-shrink-0 mt-0.5">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  useOnboardingStore.getState().toggleStepCompletion(task.id, stepIndex);
+                                }}
+                                className={`
+                                  w-5 h-5 rounded border-2 flex items-center justify-center transition-colors
+                                  ${task.stepsCompleted?.includes(stepIndex)
+                                    ? 'bg-green-500 border-green-500'
+                                    : 'border-gray-400 hover:border-green-500'
+                                  }
+                                `}
+                              >
+                                {task.stepsCompleted?.includes(stepIndex) && (
+                                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </button>
+                            </div>
+                            <div className="flex-1">
+                              <span className="font-medium text-blue-700 mr-2">{stepIndex + 1}.</span>
+                              <span className={`text-gray-700 ${task.stepsCompleted?.includes(stepIndex) ? 'line-through opacity-60' : ''}`}>
+                                {step}
+                              </span>
+                            </div>
                           </li>
                         ))}
                       </ol>
