@@ -10,6 +10,14 @@ export const onboardingSchema = z.object({
   branch: z.enum(['Army', 'Navy', 'Air Force', 'Marine Corps', 'Coast Guard', 'Space Force']),
   mos: z.string().min(1, 'MOS/AFSC/NEC is required'),
   goal: z.enum(['career', 'education', 'housing', 'finance', 'wellness']),
+  secondaryGoals: z.array(z.enum(['career', 'education', 'housing', 'finance', 'wellness'])).optional(),
+  goalDetails: z.object({
+    careerPath: z.enum(['job-search', 'start-business', 'certifications', 'not-sure']).optional(),
+    educationPath: z.enum(['college-degree', 'vocational-training', 'certifications', 'gi-bill-info']).optional(),
+    housingPath: z.enum(['rent-lease', 'buy-home', 'va-loan', 'temporary-housing']).optional(),
+    financePath: z.array(z.enum(['tsp-rollover', 'budgeting', 'va-benefits', 'debt-management', 'investment'])).optional(),
+    wellnessPath: z.array(z.enum(['mental-health', 'physical-fitness', 'va-healthcare', 'substance-support', 'family-counseling'])).optional(),
+  }).optional(),
   location: z.string().optional(),
   disabilityClaim: z.boolean(),
   giBill: z.boolean(),
@@ -27,6 +35,9 @@ export const missionTaskSchema = z.object({
   deadline: z.string().optional(),
   priority: z.enum(['high', 'medium', 'low']),
   completed: z.boolean(),
+  steps: z.array(z.string()).optional(),
+  notes: z.string().optional(),
+  core: z.boolean().optional(),
 });
 
 export const missionPlanSchema = z.object({

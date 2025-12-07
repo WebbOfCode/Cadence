@@ -11,9 +11,11 @@ interface TaskDetailDrawerProps {
   task: MissionTask | null;
   onClose: () => void;
   userMOS?: string;
+  timeInService?: string;
+  dischargeRank?: string;
 }
 
-export function TaskDetailDrawer({ task, onClose, userMOS }: TaskDetailDrawerProps) {
+export function TaskDetailDrawer({ task, onClose, userMOS, timeInService, dischargeRank }: TaskDetailDrawerProps) {
   const { updateTask } = useOnboardingStore();
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [noteText, setNoteText] = useState(task?.notes || '');
@@ -88,6 +90,23 @@ export function TaskDetailDrawer({ task, onClose, userMOS }: TaskDetailDrawerPro
             <p className="text-gray-700 leading-relaxed">{task.description}</p>
           </section>
 
+          {/* Steps Section */}
+          {task.steps && task.steps.length > 0 && (
+            <section>
+              <h3 className="text-lg font-bold mb-4">How to Complete This Task</h3>
+              <div className="p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+                <ol className="space-y-3">
+                  {task.steps.map((step, stepIndex) => (
+                    <li key={stepIndex} className="flex gap-3">
+                      <span className="flex-shrink-0 font-semibold text-blue-600 w-6">{stepIndex + 1}.</span>
+                      <span className="text-gray-700 text-sm leading-relaxed">{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </section>
+          )}
+
           {/* Task Info */}
           <section className="bg-gray-50 p-4 rounded-lg">
             <h3 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-3">Task Information</h3>
@@ -110,6 +129,18 @@ export function TaskDetailDrawer({ task, onClose, userMOS }: TaskDetailDrawerPro
                 <div>
                   <p className="text-gray-600">Your MOS</p>
                   <p className="font-medium">{userMOS}</p>
+                </div>
+              )}
+              {timeInService && (
+                <div>
+                  <p className="text-gray-600">Time in Service</p>
+                  <p className="font-medium">{timeInService} {timeInService === '1' ? 'year' : 'years'}</p>
+                </div>
+              )}
+              {dischargeRank && (
+                <div>
+                  <p className="text-gray-600">Discharge Rank</p>
+                  <p className="font-medium">{dischargeRank}</p>
                 </div>
               )}
             </div>

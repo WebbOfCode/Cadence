@@ -58,20 +58,31 @@ export async function POST(req: NextRequest) {
 
     const aiResponse = JSON.parse(responseContent);
     
-    // Structure the mission plan
-    const missionPlan: MissionPlan = {
-      veteranName: validatedData.name,
-      etsDate: validatedData.etsDate,
-      overview: aiResponse.overview,
-      tasks: aiResponse.tasks.map((task: any, index: number) => ({
-        id: `task-${index + 1}`,
+    // Generate universal core tasks that apply to everyone
+    const coreTasks = generateCoreTasks(validatedData, etsDate);
+    
+    // Combine core tasks with AI-generated tasks
+    const allTasks = [
+      ...coreTasks,
+      ...aiResponse.tasks.map((task: any, index: number) => ({
+        id: `task-${coreTasks.length + index + 1}`,
         title: task.title,
         description: task.description,
         category: task.category,
         deadline: task.deadline,
         priority: task.priority,
         completed: false,
-      })),
+        steps: task.steps || [],
+        core: false,
+      }))
+    ];
+    
+    // Structure the mission plan
+    const missionPlan: MissionPlan = {
+      veteranName: validatedData.name,
+      etsDate: validatedData.etsDate,
+      overview: aiResponse.overview,
+      tasks: allTasks,
       generatedAt: new Date().toISOString(),
     };
 
@@ -111,6 +122,170 @@ export async function POST(req: NextRequest) {
   }
 }
 
+function generateCoreTasks(data: z.infer<typeof onboardingSchema>, etsDate: Date): MissionTask[] {
+  const today = new Date();
+  
+  // Calculate key deadlines
+  const tapDeadline = new Date(etsDate);
+  tapDeadline.setDate(tapDeadline.getDate() - 90); // 90 days before ETS
+  
+  const preETSDeadline = new Date(etsDate);
+  preETSDeadline.setDate(preETSDeadline.getDate() - 30); // 30 days before ETS
+  
+  const coreTasks: MissionTask[] = [
+    {
+      id: 'core-1',
+      title: 'Obtain Your DD-214',
+      description: 'Proof of service — needed for everything else. Essential for VA benefits, job applications, GI Bill, and healthcare enrollment.',
+      category: 'admin',
+      deadline: data.etsDate,
+      priority: 'high',
+      completed: false,
+      core: true,
+      steps: [
+        'Contact your installation\'s Personnel or Human Resources office (S-1) to request your DD-214 (Member 4 copy)',
+        'Request at least 5-10 certified copies for VA benefits, employment, and personal records',
+        'Verify all information is accurate: dates, MOS, awards, and characterization of service',
+        'Access milConnect (https://milconnect.dmdc.osd.mil/) to download digital copies if available',
+        'Scan all copies and save to cloud storage (Google Drive, Dropbox) and external hard drive',
+        'Keep original certified copies in a fireproof safe or safety deposit box',
+      ],
+    },
+    {
+      id: 'core-2',
+      title: 'Schedule Pre-Separation Counseling',
+      description: 'Required under law. Prepares you for VA benefits, education, and civilian transition. Must be completed 90–365 days before ETS.',
+      category: 'admin',
+      deadline: tapDeadline.toISOString().split('T')[0],
+      priority: 'high',
+      completed: false,
+      core: true,
+      steps: [
+        'Locate your installation\'s Transition Assistance Program (TAP) office or call your HR office',
+        'Schedule your mandatory pre-separation counseling appointment at least 90 days before ETS',
+        'Bring your spouse if applicable — they are often welcome and encouraged to attend',
+        'Prepare questions about VA benefits, education options, and career transition resources',
+        'Complete the counseling session and obtain documentation/certificates for your records',
+      ],
+    },
+    {
+      id: 'core-3',
+      title: 'Create Your eBenefits or VA.gov Account',
+      description: 'All VA benefits are managed online through this portal. Set up 2FA and link your DS Logon. You\'ll use this to file disability claims, apply for housing benefits, and manage healthcare.',
+      category: 'admin',
+      deadline: preETSDeadline.toISOString().split('T')[0],
+      priority: 'high',
+      completed: false,
+      core: true,
+      steps: [
+        'Visit VA.gov and click "Sign in" then select "Create an account"',
+        'Choose ID.me, Login.gov, or DS Logon as your verification method',
+        'Complete identity verification process (requires government ID and personal information)',
+        'Set up two-factor authentication (2FA) for account security',
+        'Link your DS Logon or military ID to your VA.gov account',
+        'Explore the dashboard to familiarize yourself with available services and benefits',
+      ],
+    },
+    {
+      id: 'core-4',
+      title: 'Take TAP Classes (Transition GPS)',
+      description: 'Career readiness, resume building, interview prep, and job search tools. Core Curriculum includes financial planning, VA brief, and employment workshop.',
+      category: 'admin',
+      deadline: tapDeadline.toISOString().split('T')[0],
+      priority: 'high',
+      completed: false,
+      core: true,
+      steps: [
+        'Contact your TAP office to register for Transition GPS (Goals, Plans, Success) courses',
+        'Complete the DOL Employment Workshop (resume, interviews, job search strategies)',
+        'Attend the VA Benefits Briefing to understand disability, healthcare, and education benefits',
+        'Take the Financial Planning track to learn budgeting and financial management',
+        'Complete any optional tracks relevant to your goals (education, entrepreneurship, career technical)',
+        'Obtain certificates of completion for all attended workshops',
+      ],
+    },
+    {
+      id: 'core-5',
+      title: 'Register for VA Healthcare',
+      description: 'Must enroll even if you don\'t plan to use it immediately. File online or visit a VA hospital in person. Coverage varies by disability rating and income.',
+      category: 'healthcare',
+      deadline: preETSDeadline.toISOString().split('T')[0],
+      priority: 'high',
+      completed: false,
+      core: true,
+      steps: [
+        'Visit VA.gov and navigate to the "Health Care" section',
+        'Click "Apply for VA Health Care" and start the online application (VA Form 10-10EZ)',
+        'Provide your military service information, income details, and contact information',
+        'Submit the application and save your confirmation number',
+        'Wait 1-2 weeks for a response from VA with your enrollment status',
+        'Once approved, schedule your first appointment at your assigned VA medical center',
+      ],
+    },
+    {
+      id: 'core-6',
+      title: 'Gather Your Medical & Service Records',
+      description: 'Needed for VA disability claims, job disability accommodations, and discharge upgrades. Get from IPERMS, Medpros, or your S-1.',
+      category: 'admin',
+      deadline: preETSDeadline.toISOString().split('T')[0],
+      priority: 'medium',
+      completed: false,
+      core: true,
+      steps: [
+        'Log in to IPERMS (Interactive Personnel Electronic Records Management System) to download service records',
+        'Access MEDPROS or your medical records system to obtain all medical documentation',
+        'Request copies of deployment records, awards, evaluations, and any incident reports',
+        'Organize documents by category: medical, personnel, awards, deployments',
+        'Save all records digitally in multiple locations (cloud storage, external drive)',
+        'Request certified copies of any critical documents from your S-1 or medical office',
+      ],
+    },
+    {
+      id: 'core-7',
+      title: 'Check for Unused Leave / Terminal Leave Eligibility',
+      description: 'Use your leave or get paid out — don\'t leave money on the table. Terminal leave allows you to use vacation at the end instead of staying on post.',
+      category: 'admin',
+      deadline: new Date(etsDate.getTime() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      priority: 'medium',
+      completed: false,
+      core: true,
+      steps: [
+        'Check your Leave and Earnings Statement (LES) to see your current leave balance',
+        'Speak with your S-1/HR to understand terminal leave policies and eligibility',
+        'Calculate how much leave you can sell back (maximum 60 days lifetime)',
+        'Submit a terminal leave request if you want to use leave before final out-processing',
+        'Coordinate your terminal leave dates with your final out-processing schedule',
+        'Ensure your leave is approved before making any civilian commitments or travel plans',
+      ],
+    },
+  ];
+
+  // Add disability claim task if user indicated they plan to file
+  if (data.disabilityClaim) {
+    coreTasks.push({
+      id: 'core-8',
+      title: 'File Your VA Disability Claim',
+      description: 'If you have ANY service-connected injuries or conditions, file a claim. Can use BEP (Benefits Delivery at Discharge) if still serving. File within 1 year post-ETS to retain full eligibility.',
+      category: 'healthcare',
+      deadline: new Date(etsDate.getTime() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      priority: 'high',
+      completed: false,
+      core: true,
+      steps: [
+        'Visit VA.gov and navigate to "File a Claim for Disability Compensation"',
+        'Submit an Intent to File (ITF) immediately to establish your effective date',
+        'Gather service medical records, deployment documentation, and buddy statements',
+        'List all service-connected conditions (physical and mental health)',
+        'Consider using BEP (Benefits Delivery at Discharge) if still on active duty',
+        'Submit your full claim online or work with a Veterans Service Officer (VSO) for free assistance',
+        'Attend all VA medical exams (C&P exams) as scheduled',
+      ],
+    });
+  }
+
+  return coreTasks;
+}
+
 function buildTransitionContext(data: z.infer<typeof onboardingSchema>, daysUntilETS: number): string {
   const goalDescriptions: Record<string, string> = {
     career: 'finding civilian employment or starting a business',
@@ -120,7 +295,66 @@ function buildTransitionContext(data: z.infer<typeof onboardingSchema>, daysUnti
     wellness: 'focusing on physical and mental health',
   };
 
+  // Build detailed goal context
+  let goalContext = goalDescriptions[data.goal] || data.goal;
+  if (data.goalDetails) {
+    if (data.goalDetails.careerPath) {
+      const careerLabels: Record<string, string> = {
+        'job-search': 'actively seeking civilian employment',
+        'start-business': 'planning to start their own business',
+        'certifications': 'pursuing industry certifications',
+        'not-sure': 'exploring career options',
+      };
+      goalContext = careerLabels[data.goalDetails.careerPath];
+    }
+    if (data.goalDetails.educationPath) {
+      const eduLabels: Record<string, string> = {
+        'college-degree': 'pursuing a college degree (2-year or 4-year)',
+        'vocational-training': 'interested in vocational or trade school training',
+        'certifications': 'seeking professional certifications',
+        'gi-bill-info': 'learning about GI Bill benefits and education options',
+      };
+      goalContext = eduLabels[data.goalDetails.educationPath];
+    }
+    if (data.goalDetails.housingPath) {
+      const housingLabels: Record<string, string> = {
+        'rent-lease': 'looking to rent or lease housing',
+        'buy-home': 'planning to purchase a home',
+        'va-loan': 'interested in using VA home loan benefits',
+        'temporary-housing': 'seeking temporary housing solutions',
+      };
+      goalContext = housingLabels[data.goalDetails.housingPath];
+    }
+    if (data.goalDetails.financePath && data.goalDetails.financePath.length > 0) {
+      const financeLabels: Record<string, string> = {
+        'tsp-rollover': 'TSP/retirement account management',
+        'budgeting': 'budget creation and financial planning',
+        'va-benefits': 'maximizing VA benefits',
+        'debt-management': 'debt management and reduction',
+        'investment': 'long-term investment strategy',
+      };
+      goalContext = data.goalDetails.financePath.map(p => financeLabels[p]).join(', ');
+    }
+    if (data.goalDetails.wellnessPath && data.goalDetails.wellnessPath.length > 0) {
+      const wellnessLabels: Record<string, string> = {
+        'mental-health': 'mental health counseling and support',
+        'physical-fitness': 'physical fitness and nutrition',
+        'va-healthcare': 'VA healthcare enrollment',
+        'substance-support': 'substance abuse recovery programs',
+        'family-counseling': 'family counseling services',
+      };
+      goalContext = data.goalDetails.wellnessPath.map(p => wellnessLabels[p]).join(', ');
+    }
+  }
+
   const dischargeGuidance = getDischargeGuidance(data.dischargeType);
+
+  // Build secondary goals context
+  let secondaryGoalsContext = '';
+  if (data.secondaryGoals && data.secondaryGoals.length > 0) {
+    const secondaryGoalLabels = data.secondaryGoals.map(g => goalDescriptions[g] || g).join(', ');
+    secondaryGoalsContext = `Secondary Goals: ${secondaryGoalLabels}`;
+  }
 
   return `
 Create a personalized military transition plan for:
@@ -129,7 +363,8 @@ Name: ${data.name}
 Branch: ${data.branch}
 MOS/AFSC/NEC: ${data.mos}
 ETS Date: ${data.etsDate} (${daysUntilETS} days from now)
-Primary Goal: ${goalDescriptions[data.goal] || data.goal}
+Primary Goal: ${goalContext}
+${secondaryGoalsContext}
 ${data.location ? `Target Location: ${data.location}` : ''}
 VA Disability Claim: ${data.disabilityClaim ? 'Yes, planning to file' : 'No or unsure'}
 GI Bill: ${data.giBill ? 'Yes, will use' : 'No or not applicable'}
@@ -137,18 +372,33 @@ Discharge Type: ${data.dischargeType ? formatDischargeType(data.dischargeType) :
 
 ${dischargeGuidance}
 
-Generate a comprehensive transition checklist with 8-12 actionable tasks. Include:
+IMPORTANT: Generate tasks that are HIGHLY SPECIFIC to their stated goal: "${goalContext}"
+${secondaryGoalsContext ? `\nALSO include 1-2 tasks for their secondary goals: ${secondaryGoalsContext}` : ''}
 
-1. Critical administrative tasks (DD-214, VA enrollment, etc.)
-2. ${data.disabilityClaim ? 'Detailed disability claim preparation steps with documentation requirements' : 'General healthcare enrollment guidance'}
-3. ${data.goal === 'career' ? 'Career transition tasks: resume building, LinkedIn optimization, job search strategies, veteran hiring programs' : ''}
-${data.goal === 'education' ? 'Education planning: GI Bill application, school selection, transcript requests, FAFSA completion' : ''}
-${data.goal === 'housing' ? 'Housing tasks: VA home loan pre-qualification, housing search, relocation planning, utility setup' : ''}
-${data.goal === 'finance' ? 'Financial planning: budget creation, TSP/401k rollover, veteran benefits maximization, emergency fund setup' : ''}
-${data.goal === 'wellness' ? 'Wellness planning: VA healthcare enrollment, mental health resources, fitness routines, veteran support groups' : ''}
-4. ${data.location ? `Local veteran resources and opportunities in ${data.location}` : 'General veteran resource connections'}
-5. Timeline-based milestones leading up to ETS date
-6. ${data.giBill ? 'GI Bill application and certificate of eligibility process' : ''}
+NOTE: The following core tasks are ALREADY included in their plan automatically, so DO NOT generate duplicates:
+- DD-214 / Service records
+- Pre-separation counseling / TAP
+- VA.gov account creation / eBenefits
+- TAP/Transition GPS classes
+- VA Healthcare registration
+- Medical records gathering
+- Terminal leave / unused leave
+${data.disabilityClaim ? '- VA Disability claim filing' : ''}
+
+Generate 6-10 ADDITIONAL actionable tasks focused on their specific goal. Include:
+
+1. Goal-specific tasks tailored to: ${goalContext}
+   ${data.goal === 'career' && data.goalDetails?.careerPath === 'start-business' ? '- Business planning, LLC formation, veteran business resources, SBA loans' : ''}
+   ${data.goal === 'career' && data.goalDetails?.careerPath === 'job-search' ? '- Resume building, LinkedIn optimization, veteran hiring programs, interview prep' : ''}
+   ${data.goal === 'education' && data.goalDetails?.educationPath === 'college-degree' ? '- College application, transcript requests, FAFSA, GI Bill application' : ''}
+   ${data.goal === 'education' && data.goalDetails?.educationPath === 'vocational-training' ? '- Trade school research, apprenticeship programs, vocational certifications' : ''}
+   ${data.goal === 'housing' && data.goalDetails?.housingPath === 'buy-home' ? '- VA home loan pre-qualification, realtor selection, home inspection, closing process' : ''}
+   ${data.goal === 'housing' && data.goalDetails?.housingPath === 'rent-lease' ? '- Apartment search, rental applications, lease negotiation, security deposits' : ''}
+   ${data.goalDetails?.financePath?.includes('tsp-rollover') ? '- TSP rollover to IRA/401k, tax implications, investment options' : ''}
+   ${data.goalDetails?.wellnessPath?.includes('mental-health') ? '- VA mental health services, veteran support groups, PTSD resources' : ''}
+2. ${data.location ? `Local veteran resources and opportunities in ${data.location}` : 'General veteran resource connections'}
+3. Timeline-based milestones leading up to ETS date
+4. ${data.giBill ? 'GI Bill application and certificate of eligibility process' : ''}
 
 Each task should be:
 - Specific and actionable (not generic)
@@ -240,9 +490,14 @@ function getSystemPrompt(): string {
   return `
 You are an expert military transition advisor with deep knowledge of VA benefits, civilian career paths, and the unique challenges veterans face.
 
-Your task is to generate a personalized transition plan with specific, actionable tasks.
+Your task is to generate a highly personalized, comprehensive transition plan with specific, actionable tasks that guide veterans step-by-step through their transition.
 
-DO NOT use generic placeholders like "Task 1" or "Update resume". Be specific.
+CRITICAL REQUIREMENTS:
+- EVERY task MUST have a "steps" array with 5-8 specific, actionable steps
+- Steps must be concrete actions with real tools, websites, and organizations
+- NO generic placeholders like "Task 1", "Update resume", or "Find a job"
+- Each step should be a complete action the veteran can take immediately
+- Include specific URLs, form numbers, phone numbers, and resource names
 
 GOOD examples:
 - "Request official military transcripts from Army/ACE Registry for civilian college credit evaluation"
@@ -271,194 +526,30 @@ Return JSON in this exact format:
         "First specific, actionable step with real tools/resources",
         "Second specific step with concrete actions",
         "Third step with specific details",
-        "Continue with 3-7 total steps per task"
+        "Continue with 5-8 total steps per task - be thorough and specific"
       ]
     }
   ]
 }
 
 Ensure tasks are:
-1. Personalized to the veteran's branch, MOS, goals, and timeline
+1. Personalized to the veteran's branch, MOS, goals, time in service, discharge rank, and timeline
 2. Sequenced logically (early tasks before later dependencies)
-3. Include specific resource names (VA.gov, ebenefits, specific programs)
+3. Include specific resource names (VA.gov, milConnect, specific programs, URLs)
 4. Reference actual deadlines (90 days before ETS for TAP, etc.)
-5. Each task MUST include a "steps" array with 3-7 specific, actionable steps
+5. CRITICAL: Each task MUST include a "steps" array with 5-8 specific, actionable steps
 6. Steps should reference real tools, websites, and organizations where applicable
-7. Steps should be concrete actions, not vague advice (e.g., "Visit Zillow.com and search for properties" not "Find housing")
+7. Steps should be concrete actions, not vague advice
+8. Include specific form numbers (DD-214, VA Form 22-1990, etc.)
+9. Include specific websites and phone numbers where applicable
+10. Tailor recommendations to the veteran's specific branch, MOS, and goals
+
+Generate 10-15 tasks covering:
+- Administrative (DD-214, TAP, etc.)
+- Healthcare (VA enrollment, disability claims if applicable)
+- Career/Education/Housing/Finance/Wellness (based on primary goal)
+- Local resources and veteran support
+- Timeline-based milestones
   `.trim();
 }
 
-function generateMockMissionPlan(data: z.infer<typeof onboardingSchema>): MissionPlan {
-  const etsDate = new Date(data.etsDate);
-  const today = new Date();
-  const daysUntilETS = Math.ceil((etsDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  
-  // Calculate deadlines
-  const tapDeadline = new Date(etsDate);
-  tapDeadline.setDate(tapDeadline.getDate() - 90);
-  
-  const healthcareDeadline = new Date(etsDate);
-  healthcareDeadline.setDate(healthcareDeadline.getDate() - 30);
-  
-  const tasks: MissionTask[] = [
-    {
-      id: 'task-1',
-      title: 'Schedule TAP (Transition Assistance Program) counseling',
-      description: `Contact your installation's transition office to schedule mandatory TAP counseling at least 90 days before ETS. This comprehensive program covers resume writing, interview skills, VA benefits, and civilian job market preparation.`,
-      category: 'admin',
-      deadline: tapDeadline.toISOString().split('T')[0],
-      priority: 'high',
-      completed: false,
-      steps: [
-        'Locate your installation\'s Transition Assistance Program (TAP) office or call your Human Resources office for contact information.',
-        'Call or visit the TAP office to inquire about available counseling sessions and schedule an appointment at least 90 days before your ETS date.',
-        'Confirm the session date, time, and location, and ask if your spouse is welcome to attend.',
-        'Prepare a list of questions about resume writing, interview preparation, and VA benefits.',
-        'Attend the scheduled TAP counseling session and take notes on key information provided.',
-      ],
-    },
-    {
-      id: 'task-2',
-      title: 'Request certified copy of DD-214 upon separation',
-      description: 'Ensure you receive multiple certified copies of your DD Form 214 (Member 4 copy) at separation. This document is essential for VA benefits, employment verification, and accessing veteran services.',
-      category: 'admin',
-      deadline: data.etsDate,
-      priority: 'high',
-      completed: false,
-      steps: [
-        'Contact your installation\'s Personnel or Human Resources office to request multiple certified copies of your DD-214 form (Member 4 copy).',
-        'Request at least 5 certified copies to ensure you have extras for VA benefits, employment, and personal records.',
-        'Confirm the copies will be provided on or before your ETS date.',
-        'Upon receipt, verify all information on the DD-214 is accurate (dates, MOS, awards, characterization of service).',
-        'Scan the certified copies and save digital versions to cloud storage and an external hard drive for backup.',
-      ],
-    },
-    {
-      id: 'task-3',
-      title: 'Enroll in VA healthcare before ETS date',
-      description: 'Apply for VA healthcare online at VA.gov or visit your nearest VA medical center. Enrollment within one year of separation ensures continuous healthcare coverage.',
-      category: 'healthcare',
-      deadline: healthcareDeadline.toISOString().split('T')[0],
-      priority: 'high',
-      completed: false,
-      steps: [
-        'Visit VA.gov and navigate to the \'Health Care\' section.',
-        'Click \'Apply for VA Health Care\' and select \'Apply Now\' to start the online application.',
-        'Log in with your VA.gov account (create one if needed using your email and Social Security number).',
-        'Complete the VA Form 10-10EZ, providing your military service information, current health status, and contact details.',
-        'Submit the application and note the confirmation number for your records.',
-        'Within 2-3 weeks, the VA will contact you with enrollment information and your assigned medical facility.',
-      ],
-    },
-  ];
-
-  if (data.disabilityClaim) {
-    tasks.push({
-      id: 'task-4',
-      title: 'Gather documentation for VA disability claim',
-      description: 'Collect service medical records, deployment documentation, performance evaluations, and buddy statements supporting your claimed conditions. Request your complete military medical records through milConnect or eBenefits.',
-      category: 'healthcare',
-      deadline: new Date(etsDate.getTime() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      priority: 'high',
-      completed: false,
-      steps: [
-        'Log in to milConnect or eBenefits and request your complete military medical records (DD Form 180).',
-        'Contact your unit\'s medical officer to schedule a final separation physical and request documentation of any service-related injuries or conditions.',
-        'Gather deployment documentation, including dates, locations, and any combat-related incidents.',
-        'Collect performance evaluations and any incident reports that document service-connected conditions.',
-        'Reach out to 3-5 fellow service members who can provide buddy statements supporting your claimed conditions.',
-        'Organize all documents in a folder and create a checklist to ensure nothing is missing before filing your claim.',
-      ],
-    });
-    
-    tasks.push({
-      id: 'task-5',
-      title: 'File VA disability claim (Intent to File)',
-      description: 'Submit an Intent to File (ITF) form on VA.gov immediately to establish your effective date for benefits. This preserves your filing date while you gather supporting documentation.',
-      category: 'healthcare',
-      deadline: new Date(etsDate.getTime() - 120 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      priority: 'high',
-      completed: false,
-      steps: [
-        'Visit VA.gov and navigate to \'File a Claim for Disability Compensation\'.',
-        'Select \'File an Intent to File (ITF)\' to establish your effective date.',
-        'Log in with your VA.gov account and provide your military service information.',
-        'List the conditions you believe are service-connected (you can add more details later).',
-        'Submit the ITF form and save the confirmation number.',
-        'Begin gathering supporting documentation and schedule a consultation with a Veterans Service Officer (VSO) for free claim assistance.',
-      ],
-    });
-  }
-
-  if (data.goal === 'career') {
-    tasks.push({
-      id: `task-${tasks.length + 1}`,
-      title: `Create targeted civilian resume highlighting ${data.branch} ${data.mos} experience`,
-      description: `Translate your military experience into civilian language. Emphasize leadership, training, logistics coordination, and performance under pressure. Use metrics and tailor to your target industry.`,
-      category: 'career',
-      deadline: new Date(etsDate.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      priority: 'high',
-      completed: false,
-    });
-    
-    tasks.push({
-      id: `task-${tasks.length + 2}`,
-      title: 'Apply to veteran hiring programs',
-      description: 'Target companies with strong veteran hiring initiatives: Amazon Military Talent Program, JPMorgan Chase Veterans Program, Walmart. Use Hiring Our Heroes and RecruitMilitary job boards.',
-      category: 'career',
-      deadline: new Date(etsDate.getTime() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      priority: 'high',
-      completed: false,
-    });
-  }
-
-  if (data.giBill) {
-    tasks.push({
-      id: `task-${tasks.length + 1}`,
-      title: 'Apply for GI Bill Certificate of Eligibility',
-      description: 'Submit VA Form 22-1990 on VA.gov to obtain your Certificate of Eligibility. This is required before schools can process your GI Bill benefits.',
-      category: 'education',
-      deadline: new Date(etsDate.getTime() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      priority: 'high',
-      completed: false,
-    });
-  }
-
-  if (data.location) {
-    tasks.push({
-      id: `task-${tasks.length + 1}`,
-      title: `Research veteran resources in ${data.location}`,
-      description: `Identify local VA facilities, veteran service organizations, networking events, and community support groups in ${data.location}. Connect with the local veteran community.`,
-      category: 'wellness',
-      deadline: new Date(etsDate.getTime() - 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      priority: 'medium',
-      completed: false,
-    });
-  }
-
-  tasks.push({
-    id: `task-${tasks.length + 1}`,
-    title: 'Create 90-day post-ETS transition budget',
-    description: 'Calculate monthly expenses including housing, utilities, healthcare, transportation, and food. Account for potential gap between ETS and first civilian paycheck. Set aside 3-6 months expenses if possible.',
-    category: 'finance',
-    deadline: new Date(etsDate.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    priority: 'medium',
-    completed: false,
-  });
-
-  const goalLabels: Record<string, string> = {
-    career: 'career transition',
-    education: 'education and training',
-    housing: 'housing and relocation',
-    finance: 'financial planning',
-    wellness: 'health and wellness',
-  };
-
-  return {
-    veteranName: data.name,
-    etsDate: data.etsDate,
-    overview: `Your transition plan focuses on ${goalLabels[data.goal] || 'your goals'} with ${daysUntilETS} days until ETS. ${data.disabilityClaim ? 'We\'ve prioritized VA disability claim preparation alongside ' : 'Key priorities include '}administrative tasks, healthcare enrollment, and ${goalLabels[data.goal] || 'transition preparation'}.`,
-    tasks,
-    generatedAt: new Date().toISOString(),
-  };
-}

@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Search, Download } from 'lucide-react';
+import { Search, Download, Settings } from 'lucide-react';
 import { useOnboardingStore } from '@/lib/useOnboardingStore';
 import { formatDate, getDaysUntilETS, getGoalLabel } from '@/lib/utils';
 import type { MissionTask } from '@/lib/types';
 import { TaskDetailDrawer } from './components/TaskDetailDrawer';
+import { EditGoalsModal } from './components/EditGoalsModal';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   // Track which task's steps are expanded (by task ID)
   const [expandedStepsTaskId, setExpandedStepsTaskId] = useState<string | null>(null);
+  const [isEditGoalsOpen, setIsEditGoalsOpen] = useState(false);
 
   useEffect(() => {
     if (!missionPlan) {
@@ -130,13 +132,22 @@ export default function DashboardPage() {
               Welcome back, {data.name}
             </p>
           </div>
-          <button
-            onClick={exportMissionPlan}
-            className="flex items-center gap-2 px-4 py-3 border-2 border-gray-200 rounded-lg hover:border-black transition-colors font-medium"
-          >
-            <Download size={20} />
-            Export
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setIsEditGoalsOpen(true)}
+              className="flex items-center gap-2 px-4 py-3 border-2 border-gray-200 rounded-lg hover:border-black transition-colors font-medium"
+            >
+              <Settings size={20} />
+              Edit Goals
+            </button>
+            <button
+              onClick={exportMissionPlan}
+              className="flex items-center gap-2 px-4 py-3 border-2 border-gray-200 rounded-lg hover:border-black transition-colors font-medium"
+            >
+              <Download size={20} />
+              Export
+            </button>
+          </div>
         </div>
 
         {/* Priority Breakdown */}
@@ -363,6 +374,13 @@ export default function DashboardPage() {
         task={selectedTask} 
         onClose={() => setSelectedTask(null)} 
         userMOS={data.mos}
+        timeInService={data.timeInService}
+        dischargeRank={data.dischargeRank}
+      />
+
+      <EditGoalsModal 
+        isOpen={isEditGoalsOpen}
+        onClose={() => setIsEditGoalsOpen(false)}
       />
     </div>
   );

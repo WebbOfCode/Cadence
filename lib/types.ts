@@ -26,6 +26,14 @@ export interface OnboardingData {
   branch: MilitaryBranch;
   mos: string;
   goal: TransitionGoal;
+  secondaryGoals?: TransitionGoal[];
+  goalDetails?: {
+    careerPath?: 'job-search' | 'start-business' | 'certifications' | 'not-sure';
+    educationPath?: 'college-degree' | 'vocational-training' | 'certifications' | 'gi-bill-info';
+    housingPath?: 'rent-lease' | 'buy-home' | 'va-loan' | 'temporary-housing';
+    financePath?: ('tsp-rollover' | 'budgeting' | 'va-benefits' | 'debt-management' | 'investment')[];
+    wellnessPath?: ('mental-health' | 'physical-fitness' | 'va-healthcare' | 'substance-support' | 'family-counseling')[];
+  };
   location?: string;
   disabilityClaim: boolean;
   giBill: boolean;
@@ -34,6 +42,8 @@ export interface OnboardingData {
   hasAwards: boolean;
   awards: string[]; // Selected awards from predefined list
   otherAwards?: string; // Free-text field for additional awards not in the list
+  timeInService?: string; // Years of service (e.g., "4", "8", "20+")
+  dischargeRank?: string; // Rank at discharge (branch-specific)
 }
 
 export interface MissionTask {
@@ -47,6 +57,8 @@ export interface MissionTask {
   notes?: string;
   // Steps array for "How to complete" feature - provides actionable steps for task completion
   steps?: string[];
+  // Core/universal tasks that apply to everyone
+  core?: boolean;
 }
 
 export interface MissionPlan {

@@ -35,6 +35,8 @@ export function Summary({ onBack }: SummaryProps) {
         ...(data.location && { location: data.location }),
         ...(data.dischargeType && { dischargeType: data.dischargeType }),
         ...(data.otherAwards && { otherAwards: data.otherAwards }),
+        ...(data.timeInService && { timeInService: data.timeInService }),
+        ...(data.dischargeRank && { dischargeRank: data.dischargeRank }),
       };
 
       console.log('Submitting onboarding data:', cleanData);
@@ -111,6 +113,20 @@ export function Summary({ onBack }: SummaryProps) {
             <p className="text-sm font-medium uppercase tracking-wide text-gray-500">Branch & MOS</p>
             <p className="text-lg mt-1">{data.branch} • {data.mos}</p>
           </div>
+
+          {data.timeInService && (
+            <div>
+              <p className="text-sm font-medium uppercase tracking-wide text-gray-500">Time in Service</p>
+              <p className="text-lg mt-1">{data.timeInService} {data.timeInService === '1' ? 'year' : 'years'}</p>
+            </div>
+          )}
+
+          {data.dischargeRank && (
+            <div>
+              <p className="text-sm font-medium uppercase tracking-wide text-gray-500">Discharge Rank</p>
+              <p className="text-lg mt-1">{data.dischargeRank}</p>
+            </div>
+          )}
 
           <div>
             <p className="text-sm font-medium uppercase tracking-wide text-gray-500">Primary Goal</p>

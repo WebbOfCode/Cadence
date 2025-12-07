@@ -33,6 +33,9 @@ export function StepGIBill({ onNext, onBack }: StepGIBillProps) {
   });
 
   const selectedValue = watch('giBill');
+  
+  // Check if discharge type may limit GI Bill eligibility
+  const hasDischargeWarning = data.dischargeType && ['general', 'other-than-honorable', 'bad-conduct', 'dishonorable'].includes(data.dischargeType);
 
   const handleSelection = (value: boolean) => {
     setValue('giBill', value, { shouldValidate: true });
@@ -54,6 +57,53 @@ export function StepGIBill({ onNext, onBack }: StepGIBillProps) {
             Planning to use education benefits
           </p>
         </div>
+
+        {/* VocRehab Priority Notice */}
+        <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+          <div className="flex gap-3">
+            <span className="text-2xl">💡</span>
+            <div className="space-y-2">
+              <h3 className="font-bold text-blue-900">Important: Check VocRehab First!</h3>
+              <p className="text-sm text-blue-800">
+                <strong>VR&E (Vocational Rehabilitation & Employment)</strong> provides up to 48 months of education benefits with MORE support than GI Bill:
+              </p>
+              <ul className="text-sm text-blue-800 list-disc ml-5 space-y-1">
+                <li>Covers tuition, books, supplies, AND living expenses</li>
+                <li>Provides career counseling and job placement assistance</li>
+                <li><strong>Does NOT use your GI Bill months</strong></li>
+                <li>Can be used BEFORE GI Bill to preserve your benefits</li>
+              </ul>
+              <p className="text-sm text-blue-900 font-semibold mt-2">
+                ✅ If you have a service-connected disability rating (even 10%), apply for VocRehab BEFORE using GI Bill!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Discharge Type Warning */}
+        {hasDischargeWarning && (
+          <div className="p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+            <div className="flex gap-3">
+              <span className="text-2xl">⚠️</span>
+              <div className="space-y-2">
+                <h3 className="font-bold text-yellow-900">GI Bill Eligibility May Be Limited</h3>
+                <p className="text-sm text-yellow-800">
+                  With a <strong>{data.dischargeType}</strong> discharge, your GI Bill eligibility may be restricted or denied. However, you may still qualify for:
+                </p>
+                <ul className="text-sm text-yellow-800 list-disc ml-5 space-y-1">
+                  <li><strong>VR&E (VocRehab)</strong> - Often available with service-connected disability</li>
+                  <li><strong>Pell Grants</strong> - Federal student aid based on financial need</li>
+                  <li><strong>Federal Student Loans</strong> - FAFSA-based financial aid</li>
+                  <li><strong>State/Local Veteran Programs</strong> - Some states offer education benefits</li>
+                  <li><strong>Employer Tuition Assistance</strong> - Many veteran-friendly employers</li>
+                </ul>
+                <p className="text-sm text-yellow-900 font-semibold mt-2">
+                  Consider a <strong>discharge upgrade</strong> to gain full GI Bill access.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-4">
           <button

@@ -14,9 +14,11 @@ import { StepDisability } from './components/StepDisability';
 import { StepGIBill } from './components/StepGIBill';
 import { StepDischargeType } from './components/StepDischargeType';
 import { StepAwards } from './components/StepAwards';
+import { StepTimeInService } from './components/StepTimeInService';
+import { StepDischargeRank } from './components/StepDischargeRank';
 import { Summary } from './components/Summary';
 
-const TOTAL_STEPS = 11;
+const TOTAL_STEPS = 13;
 
 export default function OnboardingPage() {
   const { currentStep, nextStep, prevStep } = useOnboardingStore();
@@ -55,6 +57,10 @@ export default function OnboardingPage() {
       case 9:
         return <StepAwards onNext={handleNext} onBack={handleBack} />;
       case 10:
+        return <StepTimeInService onNext={handleNext} onBack={handleBack} />;
+      case 11:
+        return <StepDischargeRank onNext={handleNext} onBack={handleBack} />;
+      case 12:
         return <Summary onBack={handleBack} />;
       default:
         return <StepName onNext={handleNext} />;

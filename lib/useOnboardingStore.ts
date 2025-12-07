@@ -33,7 +33,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
       setStep: (step) => set({ currentStep: step }),
       
       nextStep: () => set((state) => ({ 
-        currentStep: Math.min(state.currentStep + 1, 10) 
+        currentStep: Math.min(state.currentStep + 1, 12) 
       })),
       
       prevStep: () => set((state) => ({ 
