@@ -10,7 +10,6 @@ import type { MissionTask } from '@/lib/types';
 import { TaskDetailDrawer } from './components/TaskDetailDrawer';
 import { EditGoalsModal } from './components/EditGoalsModal';
 import { getCategoryIcon, type TaskCategory } from '@/lib/categoryIcons';
-import jsPDF from 'jspdf';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -45,110 +44,129 @@ export default function DashboardPage() {
   const mediumPriorityCompleted = mediumPriorityTasks.filter((t) => t.completed).length;
 
   const toggleTask = (taskId: string) => {
-    updateTaskCompletion(taskId, !tasks.find((t) => t.id === taskId)?.completed);
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task) return;
+
+    // If task has steps, check if all are completed before allowing task completion
+    if (task.steps && task.steps.length > 0 && !task.completed) {
+      const completedSteps = task.stepsCompleted?.length || 0;
+      if (completedSteps < task.steps.length) {
+        // Show alert that steps must be completed first
+        alert(`Please complete all ${task.steps.length} steps before marking this task as done. (${completedSteps}/${task.steps.length} completed)`);
+        return;
+      }
+    }
+
+    updateTaskCompletion(taskId, !task.completed);
   };
 
-  const exportMissionPlan = () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    let yPos = 20;
+  const exportMissionPlan = async () => {
+    try {
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      let yPos = 20;
 
-    // Title
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Cadence Military Transition Plan', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 15;
-
-    // Veteran Info
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Veteran: ${missionPlan.veteranName}`, 20, yPos);
-    yPos += 8;
-    doc.text(`ETS Date: ${formatDate(missionPlan.etsDate)} (${daysUntilETS} days remaining)`, 20, yPos);
-    yPos += 8;
-    doc.text(`Branch: ${data.branch} | MOS: ${data.mos}`, 20, yPos);
-    yPos += 8;
-    doc.text(`Primary Goal: ${data.goal && getGoalLabel(data.goal)}`, 20, yPos);
-    yPos += 15;
-
-    // Progress Summary
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Progress Summary', 20, yPos);
-    yPos += 8;
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Total Tasks: ${tasks.length} | Completed: ${completedCount} (${Math.round(progressPercent)}%)`, 20, yPos);
-    yPos += 6;
-    doc.text(`High Priority: ${highPriorityCompleted}/${highPriorityTasks.length} | Medium Priority: ${mediumPriorityCompleted}/${mediumPriorityTasks.length}`, 20, yPos);
-    yPos += 15;
-
-    // Overview
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Transition Overview', 20, yPos);
-    yPos += 8;
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    const overviewLines = doc.splitTextToSize(missionPlan.overview, pageWidth - 40);
-    doc.text(overviewLines, 20, yPos);
-    yPos += overviewLines.length * 5 + 10;
-
-    // Tasks
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Task List', 20, yPos);
-    yPos += 10;
-
-    tasks.forEach((task, index) => {
-      // Check if we need a new page
-      if (yPos > pageHeight - 40) {
-        doc.addPage();
-        yPos = 20;
-      }
-
-      // Task title
-      doc.setFontSize(11);
+      // Title
+      doc.setFontSize(24);
       doc.setFont('helvetica', 'bold');
-      const checkbox = task.completed ? '[✓]' : '[ ]';
-      doc.text(`${checkbox} ${task.title}`, 20, yPos);
-      yPos += 6;
+      doc.text('Cadence Military Transition Plan', pageWidth / 2, yPos, { align: 'center' });
+      yPos += 15;
 
-      // Task details
-      doc.setFontSize(9);
+      // Veteran Info
+      doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Priority: ${task.priority.toUpperCase()} | Category: ${getCategoryLabel(task.category)}${task.core ? ' | CORE TASK' : ''}`, 25, yPos);
-      yPos += 5;
-      
-      if (task.deadline) {
-        const isOverdue = new Date(task.deadline) < new Date() && !task.completed;
-        doc.text(`Deadline: ${formatDate(task.deadline)}${isOverdue ? ' (OVERDUE)' : ''}`, 25, yPos);
+      doc.text(`Veteran: ${missionPlan.veteranName}`, 20, yPos);
+      yPos += 8;
+      doc.text(`ETS Date: ${formatDate(missionPlan.etsDate)} (${daysUntilETS} days remaining)`, 20, yPos);
+      yPos += 8;
+      doc.text(`Branch: ${data.branch} | MOS: ${data.mos}`, 20, yPos);
+      yPos += 8;
+      doc.text(`Primary Goal: ${data.goal && getGoalLabel(data.goal)}`, 20, yPos);
+      yPos += 15;
+
+      // Progress Summary
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Progress Summary', 20, yPos);
+      yPos += 8;
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Total Tasks: ${tasks.length} | Completed: ${completedCount} (${Math.round(progressPercent)}%)`, 20, yPos);
+      yPos += 6;
+      doc.text(`High Priority: ${highPriorityCompleted}/${highPriorityTasks.length} | Medium Priority: ${mediumPriorityCompleted}/${mediumPriorityTasks.length}`, 20, yPos);
+      yPos += 15;
+
+      // Overview
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Transition Overview', 20, yPos);
+      yPos += 8;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const overviewLines = doc.splitTextToSize(missionPlan.overview, pageWidth - 40);
+      doc.text(overviewLines, 20, yPos);
+      yPos += overviewLines.length * 5 + 10;
+
+      // Tasks
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Task List', 20, yPos);
+      yPos += 10;
+
+      tasks.forEach((task) => {
+        // Check if we need a new page
+        if (yPos > pageHeight - 40) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        // Task title
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        const checkbox = task.completed ? '[✓]' : '[ ]';
+        doc.text(`${checkbox} ${task.title}`, 20, yPos);
+        yPos += 6;
+
+        // Task details
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Priority: ${task.priority.toUpperCase()} | Category: ${getCategoryLabel(task.category)}${task.core ? ' | CORE TASK' : ''}`, 25, yPos);
         yPos += 5;
-      }
+        
+        if (task.deadline) {
+          const isOverdue = new Date(task.deadline) < new Date() && !task.completed;
+          doc.text(`Deadline: ${formatDate(task.deadline)}${isOverdue ? ' (OVERDUE)' : ''}`, 25, yPos);
+          yPos += 5;
+        }
 
-      // Description
-      const descLines = doc.splitTextToSize(task.description, pageWidth - 50);
-      doc.text(descLines, 25, yPos);
-      yPos += descLines.length * 4 + 3;
+        // Description
+        const descLines = doc.splitTextToSize(task.description, pageWidth - 50);
+        doc.text(descLines, 25, yPos);
+        yPos += descLines.length * 4 + 3;
 
-      // Steps progress
-      if (task.steps && task.steps.length > 0) {
-        doc.text(`Steps: ${task.stepsCompleted?.length || 0}/${task.steps.length} completed`, 25, yPos);
-        yPos += 5;
-      }
+        // Steps progress
+        if (task.steps && task.steps.length > 0) {
+          doc.text(`Steps: ${task.stepsCompleted?.length || 0}/${task.steps.length} completed`, 25, yPos);
+          yPos += 5;
+        }
 
-      yPos += 5; // Space between tasks
-    });
+        yPos += 5; // Space between tasks
+      });
 
-    // Footer
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'italic');
-    doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-    doc.text('Cadence - Military Transition Support', pageWidth / 2, pageHeight - 5, { align: 'center' });
+      // Footer
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'italic');
+      doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+      doc.text('Cadence - Military Transition Support', pageWidth / 2, pageHeight - 5, { align: 'center' });
 
-    // Save PDF
-    doc.save(`cadence-mission-plan-${data.name?.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`);
+      // Save PDF
+      doc.save(`cadence-mission-plan-${data.name?.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+      console.error('Failed to export PDF:', error);
+      alert('Failed to export PDF. Please try again.');
+    }
   };
 
   let filteredTasks = filter === 'all' 
@@ -460,10 +478,19 @@ export default function DashboardPage() {
                   {/* Step Progress Indicator */}
                   {task.steps && task.steps.length > 0 && (
                     <div className="mb-3">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                        <span className="font-medium">
+                      <div className="flex items-center gap-2 text-sm mb-2">
+                        <span className={`font-medium ${
+                          !task.completed && (task.stepsCompleted?.length || 0) < task.steps.length
+                            ? 'text-orange-600'
+                            : 'text-gray-600'
+                        }`}>
                           {task.stepsCompleted?.length || 0}/{task.steps.length} steps completed
                         </span>
+                        {!task.completed && (task.stepsCompleted?.length || 0) < task.steps.length && (
+                          <span className="text-xs text-orange-600 font-medium">
+                            (Complete all steps to finish task)
+                          </span>
+                        )}
                       </div>
                       <div className="flex gap-1">
                         {task.steps.map((_, index) => (
@@ -505,18 +532,21 @@ export default function DashboardPage() {
                       <h4 className="font-semibold text-gray-800 mb-3">How to complete this task:</h4>
                       <ol className="space-y-3">
                         {task.steps.map((step, stepIndex) => (
-                          <li key={stepIndex} className="flex gap-3">
+                          <li 
+                            key={stepIndex} 
+                            className="flex gap-3 cursor-pointer hover:bg-blue-100 p-2 rounded transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              useOnboardingStore.getState().toggleStepCompletion(task.id, stepIndex);
+                            }}
+                          >
                             <div className="flex-shrink-0 mt-0.5">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  useOnboardingStore.getState().toggleStepCompletion(task.id, stepIndex);
-                                }}
+                              <div
                                 className={`
                                   w-5 h-5 rounded border-2 flex items-center justify-center transition-colors
                                   ${task.stepsCompleted?.includes(stepIndex)
                                     ? 'bg-green-500 border-green-500'
-                                    : 'border-gray-400 hover:border-green-500'
+                                    : 'border-gray-400 group-hover:border-green-500'
                                   }
                                 `}
                               >
@@ -525,7 +555,7 @@ export default function DashboardPage() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                   </svg>
                                 )}
-                              </button>
+                              </div>
                             </div>
                             <div className="flex-1">
                               <span className="font-medium text-blue-700 mr-2">{stepIndex + 1}.</span>

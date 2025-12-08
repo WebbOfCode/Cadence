@@ -120,10 +120,19 @@ export function TaskDetailDrawer({ task, onClose, userMOS, timeInService, discha
               
               {/* Step Progress */}
               <div className="mb-4">
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                  <span className="font-medium">
+                <div className="flex items-center gap-2 text-sm mb-2">
+                  <span className={`font-medium ${
+                    !task.completed && (task.stepsCompleted?.length || 0) < task.steps.length
+                      ? 'text-orange-600'
+                      : 'text-gray-600'
+                  }`}>
                     {task.stepsCompleted?.length || 0}/{task.steps.length} steps completed
                   </span>
+                  {!task.completed && (task.stepsCompleted?.length || 0) < task.steps.length && (
+                    <span className="text-xs text-orange-600 font-medium">
+                      (Required to complete task)
+                    </span>
+                  )}
                 </div>
                 <div className="flex gap-1">
                   {task.steps.map((_, index) => (
@@ -142,15 +151,18 @@ export function TaskDetailDrawer({ task, onClose, userMOS, timeInService, discha
               <div className="p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
                 <ol className="space-y-3">
                   {task.steps.map((step, stepIndex) => (
-                    <li key={stepIndex} className="flex gap-3">
+                    <li 
+                      key={stepIndex} 
+                      className="flex gap-3 cursor-pointer hover:bg-blue-100 p-2 rounded transition-colors"
+                      onClick={() => toggleStepCompletion(task.id, stepIndex)}
+                    >
                       <div className="flex-shrink-0 mt-0.5">
-                        <button
-                          onClick={() => toggleStepCompletion(task.id, stepIndex)}
+                        <div
                           className={`
                             w-5 h-5 rounded border-2 flex items-center justify-center transition-colors
                             ${task.stepsCompleted?.includes(stepIndex)
                               ? 'bg-green-500 border-green-500'
-                              : 'border-gray-400 hover:border-green-500'
+                              : 'border-gray-400 group-hover:border-green-500'
                             }
                           `}
                         >
@@ -159,7 +171,7 @@ export function TaskDetailDrawer({ task, onClose, userMOS, timeInService, discha
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                             </svg>
                           )}
-                        </button>
+                        </div>
                       </div>
                       <div className="flex-1">
                         <span className="font-semibold text-blue-700 mr-2">{stepIndex + 1}.</span>
