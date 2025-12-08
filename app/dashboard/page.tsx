@@ -10,6 +10,7 @@ import type { MissionTask } from '@/lib/types';
 import { TaskDetailDrawer } from './components/TaskDetailDrawer';
 import { EditGoalsModal } from './components/EditGoalsModal';
 import { getCategoryIcon, type TaskCategory } from '@/lib/categoryIcons';
+import jsPDF from 'jspdf';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -48,36 +49,106 @@ export default function DashboardPage() {
   };
 
   const exportMissionPlan = () => {
-    const exportData = {
-      veteranName: missionPlan.veteranName,
-      etsDate: missionPlan.etsDate,
-      daysUntilETS,
-      overview: missionPlan.overview,
-      generatedAt: missionPlan.generatedAt,
-      exportedAt: new Date().toISOString(),
-      progressSummary: {
-        totalTasks: tasks.length,
-        completedTasks: completedCount,
-        progressPercent: Math.round(progressPercent),
-        highPriority: { completed: highPriorityCompleted, total: highPriorityTasks.length },
-        mediumPriority: { completed: mediumPriorityCompleted, total: mediumPriorityTasks.length },
-      },
-      tasks: tasks.map((task) => ({
-        ...task,
-        categoryLabel: getCategoryLabel(task.category),
-      })),
-    };
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPos = 20;
 
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `cadence-mission-plan-${data.name?.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Title
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Cadence Military Transition Plan', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 15;
+
+    // Veteran Info
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Veteran: ${missionPlan.veteranName}`, 20, yPos);
+    yPos += 8;
+    doc.text(`ETS Date: ${formatDate(missionPlan.etsDate)} (${daysUntilETS} days remaining)`, 20, yPos);
+    yPos += 8;
+    doc.text(`Branch: ${data.branch} | MOS: ${data.mos}`, 20, yPos);
+    yPos += 8;
+    doc.text(`Primary Goal: ${data.goal && getGoalLabel(data.goal)}`, 20, yPos);
+    yPos += 15;
+
+    // Progress Summary
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Progress Summary', 20, yPos);
+    yPos += 8;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Total Tasks: ${tasks.length} | Completed: ${completedCount} (${Math.round(progressPercent)}%)`, 20, yPos);
+    yPos += 6;
+    doc.text(`High Priority: ${highPriorityCompleted}/${highPriorityTasks.length} | Medium Priority: ${mediumPriorityCompleted}/${mediumPriorityTasks.length}`, 20, yPos);
+    yPos += 15;
+
+    // Overview
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Transition Overview', 20, yPos);
+    yPos += 8;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const overviewLines = doc.splitTextToSize(missionPlan.overview, pageWidth - 40);
+    doc.text(overviewLines, 20, yPos);
+    yPos += overviewLines.length * 5 + 10;
+
+    // Tasks
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Task List', 20, yPos);
+    yPos += 10;
+
+    tasks.forEach((task, index) => {
+      // Check if we need a new page
+      if (yPos > pageHeight - 40) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      // Task title
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'bold');
+      const checkbox = task.completed ? '[✓]' : '[ ]';
+      doc.text(`${checkbox} ${task.title}`, 20, yPos);
+      yPos += 6;
+
+      // Task details
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Priority: ${task.priority.toUpperCase()} | Category: ${getCategoryLabel(task.category)}${task.core ? ' | CORE TASK' : ''}`, 25, yPos);
+      yPos += 5;
+      
+      if (task.deadline) {
+        const isOverdue = new Date(task.deadline) < new Date() && !task.completed;
+        doc.text(`Deadline: ${formatDate(task.deadline)}${isOverdue ? ' (OVERDUE)' : ''}`, 25, yPos);
+        yPos += 5;
+      }
+
+      // Description
+      const descLines = doc.splitTextToSize(task.description, pageWidth - 50);
+      doc.text(descLines, 25, yPos);
+      yPos += descLines.length * 4 + 3;
+
+      // Steps progress
+      if (task.steps && task.steps.length > 0) {
+        doc.text(`Steps: ${task.stepsCompleted?.length || 0}/${task.steps.length} completed`, 25, yPos);
+        yPos += 5;
+      }
+
+      yPos += 5; // Space between tasks
+    });
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'italic');
+    doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+    doc.text('Cadence - Military Transition Support', pageWidth / 2, pageHeight - 5, { align: 'center' });
+
+    // Save PDF
+    doc.save(`cadence-mission-plan-${data.name?.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   let filteredTasks = filter === 'all' 
@@ -276,6 +347,38 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Mission Complete Celebration */}
+        {progressPercent === 100 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.5, type: "spring" }}
+            className="mb-8 p-8 bg-gradient-to-r from-green-50 via-blue-50 to-purple-50 border-2 border-green-300 rounded-lg shadow-lg"
+          >
+            <div className="text-center">
+              <div className="text-6xl mb-4">🎖️</div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Transition Mission Complete!
+              </h2>
+              <p className="text-lg text-gray-700 mb-4">
+                You've completed all tasks in your Cadence mission plan. Time to enjoy civilian life!
+              </p>
+              <div className="flex justify-center gap-4 mt-6">
+                <button
+                  onClick={exportMissionPlan}
+                  className="flex items-center gap-2 px-6 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  <Download size={20} />
+                  Download Your Achievement
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mt-4">
+                🎉 Thank you for your service. Welcome to the next chapter!
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         {/* Task List */}
         <div className="space-y-4">
           {filteredTasks.map((task, index) => (
@@ -288,7 +391,9 @@ export default function DashboardPage() {
                 p-6 border-2 rounded-lg transition-all cursor-pointer
                 ${task.completed 
                   ? 'border-gray-200 bg-gray-50 opacity-60' 
-                  : 'border-gray-200 hover:border-black'
+                  : task.deadline && new Date(task.deadline) < new Date()
+                    ? 'border-red-300 bg-red-50 hover:border-red-400'
+                    : 'border-gray-200 hover:border-black'
                 }
               `}
             >
@@ -313,10 +418,30 @@ export default function DashboardPage() {
 
                 <div className="flex-1 min-w-0" onClick={(e) => { e.stopPropagation(); setSelectedTask(task); }}>
                   <div className="flex items-start justify-between gap-4 mb-2">
-                    <h3 className={`text-lg font-medium ${task.completed ? 'line-through' : ''}`}>
-                      {task.title}
-                    </h3>
-                    <div className="flex gap-2 flex-shrink-0">
+                    <div className="flex-1">
+                      <h3 className={`text-lg font-medium ${task.completed ? 'line-through' : ''}`}>
+                        {task.title}
+                      </h3>
+                      {/* Core Task Badge */}
+                      {task.core && (
+                        <span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-full mt-1 font-medium">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          Required For All Veterans
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0 flex-wrap justify-end">
+                      {/* Overdue Badge */}
+                      {task.deadline && new Date(task.deadline) < new Date() && !task.completed && (
+                        <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded border bg-red-50 text-red-700 border-red-300">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                          Overdue
+                        </span>
+                      )}
                       <span className={`px-3 py-1 text-xs font-medium rounded border ${getPriorityColor(task.priority)}`}>
                         {task.priority.toUpperCase()}
                       </span>
