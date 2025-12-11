@@ -21,3 +21,100 @@
     text-wrap: balance;
   }
 }
+
+/* Branch Theming Variables */
+:root {
+  --brand-primary: #111827; /* neutral default */
+  --brand-primary-hover: #0b1220;
+  --brand-secondary: #6b7280;
+  --brand-contrast: #ffffff;
+  --brand-bg-image: none;
+}
+
+/* Army */
+[data-branch="Army"] {
+  --brand-primary: #000000; /* Army Black */
+  --brand-primary-hover: #1a1a1a;
+  --brand-secondary: #D4AF37; /* Army Gold */
+  --brand-contrast: #ffffff;
+  --brand-bg-image: url('/branch-logos/army.svg');
+}
+
+/* Navy */
+[data-branch="Navy"] {
+  --brand-primary: #001F3F; /* Navy Blue */
+  --brand-primary-hover: #001836;
+  --brand-secondary: #C5B358; /* Navy Gold */
+  --brand-contrast: #ffffff;
+  --brand-bg-image: url('/branch-logos/navy.svg');
+}
+
+/* Air Force */
+[data-branch="Air Force"] {
+  --brand-primary: #00308F; /* Air Force Blue */
+  --brand-primary-hover: #00266f;
+  --brand-secondary: #7F7F7F; /* Air Force Silver */
+  --brand-contrast: #ffffff;
+  --brand-bg-image: url('/branch-logos/air-force.svg');
+}
+
+/* Marine Corps */
+[data-branch="Marine Corps"] {
+  --brand-primary: #CC0000; /* Scarlet Red */
+  --brand-primary-hover: #a30000;
+  --brand-secondary: #FBBF24; /* Marine Corps Gold */
+  --brand-contrast: #ffffff;
+  --brand-bg-image: url('/branch-logos/marine-corps.svg');
+}
+
+/* Coast Guard */
+[data-branch="Coast Guard"] {
+  --brand-primary: #0053A5; /* CG Blue */
+  --brand-primary-hover: #004687;
+  --brand-secondary: #E4002B; /* CG Red */
+  --brand-contrast: #ffffff;
+  --brand-bg-image: url('/branch-logos/coast-guard.svg');
+}
+
+/* Space Force */
+[data-branch="Space Force"] {
+  --brand-primary: #2F1A47; /* Dark Purple */
+  --brand-primary-hover: #231436;
+  --brand-secondary: #A7A9AC; /* Silver */
+  --brand-contrast: #ffffff;
+  --brand-bg-image: url('/branch-logos/space-force.svg');
+}
+
+/* Header and common accents themed by branch */
+[data-branch] .site-header {
+  background-color: var(--brand-primary) !important;
+  border-color: var(--brand-secondary) !important;
+  color: var(--brand-contrast) !important;
+}
+
+[data-branch] .site-header a,
+[data-branch] .site-header button {
+  color: var(--brand-contrast) !important;
+  border-color: color-mix(in oklab, var(--brand-secondary) 70%, transparent) !important;
+}
+
+[data-branch] .site-header button:hover {
+  background-color: color-mix(in oklab, var(--brand-contrast) 10%, transparent) !important;
+}
+
+/* Global link color accents */
+[data-branch] a {
+  color: var(--brand-primary);
+}
+[data-branch] a:hover {
+  color: var(--brand-primary-hover);
+}
+
+/* Subtle watermark background */
+[data-branch] body {
+  background-image: var(--brand-bg-image);
+  background-repeat: no-repeat;
+  background-position: center 20vh;
+  background-size: min(60vw, 800px);
+  background-attachment: fixed;
+}

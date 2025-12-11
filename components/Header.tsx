@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useOnboardingStore } from '@/lib/useOnboardingStore';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import BranchSwitcher from './BranchSwitcher';
 
 export function Header() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export function Header() {
   };
 
   return (
-    <header className="border-b-2 border-gray-200 bg-white sticky top-0 z-50">
+    <header className="site-header border-b-2 border-gray-200 bg-white sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <button
@@ -36,11 +37,24 @@ export function Header() {
               >
                 Dashboard
               </button>
+              <button
+                onClick={() => router.push('/benefits-scanner')}
+                className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+              >
+                Benefits Scanner
+              </button>
+              <button
+                onClick={() => router.push('/mos-translator')}
+                className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+              >
+                MOS Translator
+              </button>
             </nav>
           )}
         </div>
 
         <div className="hidden md:flex items-center gap-4">
+          <BranchSwitcher />
           {missionPlan && (
             <button
               onClick={handleReset}
@@ -64,6 +78,7 @@ export function Header() {
       {isMenuOpen && (
         <div className="md:hidden border-t-2 border-gray-200 bg-white">
           <div className="px-6 py-4 space-y-4">
+            <BranchSwitcher compact />
             {missionPlan && (
               <>
                 <button
@@ -74,6 +89,24 @@ export function Header() {
                   className="block w-full text-left text-sm font-medium text-gray-600 hover:text-black transition-colors"
                 >
                   Dashboard
+                </button>
+                <button
+                  onClick={() => {
+                    router.push('/benefits-scanner');
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left text-sm font-medium text-gray-600 hover:text-black transition-colors"
+                >
+                  Benefits Scanner
+                </button>
+                <button
+                  onClick={() => {
+                    router.push('/mos-translator');
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left text-sm font-medium text-gray-600 hover:text-black transition-colors"
+                >
+                  MOS Translator
                 </button>
                 <button
                   onClick={handleReset}
