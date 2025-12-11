@@ -1,22 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useEffect } from "react";
+import { useOnboardingStore } from "@/lib/useOnboardingStore";
 
-const TranslatorSchema = z.object({
-  mos: z.string().min(2, "Enter your MOS/NEC/AFSC/Rating"),
-  secondaryMos: z.string().optional(),
-  zip: z.string().regex(/^\d{5}(-\d{4})?$/, "Enter a valid ZIP"),
-});
-
-type TranslatorInputs = z.infer<typeof TranslatorSchema>;
-
-export default function MOSTranslatorPage() {
+export default function MOSScannerPage() {
+  const preset = useOnboardingStore((s) => s.data);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [zipCode, setZipCode] = useState<string>("");
   const [results, setResults] = useState<null | {
     jobTitles: string[];
     avgSalary: { title: string; amount: number; source: string }[];
@@ -25,102 +15,89 @@ export default function MOSTranslatorPage() {
     resumeBullets: string[];
   }>(null);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<TranslatorInputs>({ resolver: zodResolver(TranslatorSchema) });
-  async function onSubmit(values: TranslatorInputs) {
+  // Auto-run on mount if we have MOS + ZIP from onboarding
+  useEffect(() => {
+    if (preset.mos && preset.location) {
+      handleScan();
+    }
+  }, []);
+
+  async function handleScan() {
+    if (!preset.mos || !preset.location) return;
     setLoading(true);
     setError(null);
-    setZipCode(values.zip);
     try {
-      const mosToAnalyze = values.secondaryMos 
-        ? `${values.mos} (Primary), ${values.secondaryMos} (Secondary)`
-        : values.mos;
-
       const response = await fetch('/api/translate-mos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mos: mosToAnalyze,
-          zip: values.zip,
+          mos: preset.mos,
+          zip: preset.location,
+          branch: preset.branch,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to translate MOS');
+        throw new Error(errorData.error || 'Failed to generate career insights');
       }
 
       const data = await response.json();
       setResults(data);
     } catch (err) {
-      console.error('Error translating MOS:', err);
+      console.error('Error scanning MOS:', err);
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <h1 className="text-2xl font-bold">MOS Career Scanner</h1>
+      <p className="text-sm text-gray-600 mt-1">
+        Using your onboarding data to generate personalized civilian career pathways.
+      </p>
+
+      {/* Show preset values */}
+      <div className="mt-6 p-4 border-2 border-gray-200 rounded-lg bg-gray-50">
+        <h2 className="font-semibold mb-2">Your Profile</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
-            <label className="text-sm font-medium">Primary MOS / NEC / AFSC / Rating</label>
-            <input
-              className="mt-1 w-full border-2 border-gray-200 rounded-md px-3 py-2"
-              placeholder="e.g., 11B, 25B, IT, AE"
-              {...register("mos")}
-            />
-            {errors.mos && (
-              <p className="text-xs text-red-600 mt-1">{errors.mos.message}</p>
-            )}
+            <span className="font-medium">Branch:</span> {preset.branch ?? "—"}
           </div>
           <div>
-            <label className="text-sm font-medium">Secondary MOS (Optional)</label>
-            <input
-              className="mt-1 w-full border-2 border-gray-200 rounded-md px-3 py-2"
-              placeholder="e.g., 68W (if you have dual MOS)"
-              {...register("secondaryMos")}
-            />
-            <p className="text-xs text-gray-500 mt-1">Add if you hold multiple MOS designations</p>
+            <span className="font-medium">MOS:</span> {preset.mos ?? "—"}
+          </div>
+          <div>
+            <span className="font-medium">ZIP:</span> {preset.location ?? "—"}
+          </div>
+          <div>
+            <span className="font-medium">Goal:</span> {preset.goal ?? "—"}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium">ZIP Code</label>
-            <input
-              className="mt-1 w-full border-2 border-gray-200 rounded-md px-3 py-2"
-              placeholder="e.g., 90210"
-              {...register("zip")}
-            />
-            {errors.zip && (
-              <p className="text-xs text-red-600 mt-1">{errors.zip.message}</p>
-            )}
-          </div>
-          <div className="flex items-end">
-            <button
-              type="submit"
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-md font-medium hover:border-black disabled:opacity-50"
-              disabled={loading}
-            >
-              {loading ? "Translating…" : "Translate"}
-            </button>
-          </div>
-        </div>
-      </form>
+        {(!preset.mos || !preset.location) && (
+          <p className="text-xs text-yellow-700 mt-2">
+            Complete onboarding to populate MOS and ZIP for automatic scanning.
+          </p>
+        )}
+        {preset.mos && preset.location && !results && !loading && (
+          <button
+            onClick={handleScan}
+            disabled={loading}
+            className="mt-3 px-4 py-2 border-2 border-gray-200 rounded-md font-medium hover:border-black"
+          >
+            Scan Now
+          </button>
+        )}
+        {loading && (
+          <p className="text-sm text-gray-600 mt-2">Generating personalized career insights with AI...</p>
+        )}
+      </div>
 
       {error && (
         <div className="mt-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg">
           <p className="text-sm font-medium text-red-700">{error}</p>
-        </div>
-      )}
-
-      {loading && (
-        <div className="mt-6 p-4 border-2 border-gray-200 rounded-lg">
-          <p className="text-sm text-gray-600">Generating personalized career insights with AI...</p>
         </div>
       )}
 
@@ -139,8 +116,8 @@ export default function MOSTranslatorPage() {
 
           {/* Local salaries */}
           <section className="p-4 border-2 border-gray-200 rounded-lg">
-            <h2 className="font-semibold">Average Salary in {zipCode}</h2>
-            <p className="text-xs text-gray-600 mb-2">Based on local market data.</p>
+            <h2 className="font-semibold">Average Salary in Your Area</h2>
+            <p className="text-xs text-gray-600 mb-2">Based on local market data for ZIP {preset.location}.</p>
             <ul className="space-y-2">
               {results.avgSalary.map((s) => (
                 <li key={s.title} className="flex items-center justify-between">

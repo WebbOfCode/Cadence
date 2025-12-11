@@ -63,7 +63,7 @@ const subGoals = {
     { value: 'college-degree', label: 'College Degree', description: '2-year or 4-year program' },
     { value: 'vocational-training', label: 'Vocational Training', description: 'Trade school or apprenticeship' },
     { value: 'certifications', label: 'Professional Certifications', description: 'Industry credentials' },
-    { value: 'gi-bill-info', label: 'Learn About GI Bill', description: 'Education benefits info' },
+    { value: 'gi-bill-info', label: 'Learn About Education Benefits', description: 'Post-9/11 GI Bill and VocRehab info' },
   ],
   housing: [
     { value: 'rent-lease', label: 'Rent/Lease', description: 'Find rental housing' },

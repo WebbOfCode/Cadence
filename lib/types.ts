@@ -38,6 +38,7 @@ export interface OnboardingData {
   disabilityClaim: boolean;
   giBill: boolean;
   dischargeType?: DischargeType;
+  dischargeCode?: string; // Optional discharge code (RE-3, JKA, etc.) for non-honorable discharges
   // Awards and decorations - used for tailoring recommendations and resume prompts
   hasAwards: boolean;
   awards: string[]; // Selected awards from predefined list

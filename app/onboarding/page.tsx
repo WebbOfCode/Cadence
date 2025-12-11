@@ -45,21 +45,21 @@ export default function OnboardingPage() {
       case 3:
         return <StepMOS onNext={handleNext} onBack={handleBack} />;
       case 4:
-        return <StepGoal onNext={handleNext} onBack={handleBack} />;
-      case 5:
-        return <StepLocation onNext={handleNext} onBack={handleBack} />;
-      case 6:
-        return <StepDisability onNext={handleNext} onBack={handleBack} />;
-      case 7:
-        return <StepGIBill onNext={handleNext} onBack={handleBack} />;
-      case 8:
-        return <StepDischargeType onNext={handleNext} onBack={handleBack} />;
-      case 9:
-        return <StepAwards onNext={handleNext} onBack={handleBack} />;
-      case 10:
         return <StepTimeInService onNext={handleNext} onBack={handleBack} />;
-      case 11:
+      case 5:
         return <StepDischargeRank onNext={handleNext} onBack={handleBack} />;
+      case 6:
+        return <StepGoal onNext={handleNext} onBack={handleBack} />;
+      case 7:
+        return <StepDischargeType onNext={handleNext} onBack={handleBack} />;
+      case 8:
+        return <StepDisability onNext={handleNext} onBack={handleBack} />;
+      case 9:
+        return <StepGIBill onNext={handleNext} onBack={handleBack} />;
+      case 10:
+        return <StepLocation onNext={handleNext} onBack={handleBack} />;
+      case 11:
+        return <StepAwards onNext={handleNext} onBack={handleBack} />;
       case 12:
         return <Summary onBack={handleBack} />;
       default:

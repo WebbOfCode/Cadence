@@ -324,6 +324,39 @@ export default function DashboardPage() {
           <p className="text-lg text-gray-700 leading-relaxed">{missionPlan.overview}</p>
         </motion.div>
 
+        {/* Quick Access Tools */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="mb-12 p-6 border-2 border-gray-200 rounded-lg"
+        >
+          <h2 className="text-lg font-bold mb-4">Quick Access Tools</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              onClick={() => router.push('/mos-scanner')}
+              className="p-4 border-2 border-gray-200 rounded-lg hover:border-black transition-all text-left"
+            >
+              <h3 className="font-semibold mb-1">MOS Career Scanner</h3>
+              <p className="text-sm text-gray-600">Get personalized civilian career pathways based on your MOS and location</p>
+            </button>
+            <button
+              onClick={() => router.push('/mos-translator')}
+              className="p-4 border-2 border-gray-200 rounded-lg hover:border-black transition-all text-left"
+            >
+              <h3 className="font-semibold mb-1">MOS Translator</h3>
+              <p className="text-sm text-gray-600">Translate your MOS to civilian job titles with salary insights</p>
+            </button>
+            <button
+              onClick={() => router.push('/benefits-scanner')}
+              className="p-4 border-2 border-gray-200 rounded-lg hover:border-black transition-all text-left"
+            >
+              <h3 className="font-semibold mb-1">Benefits Scanner</h3>
+              <p className="text-sm text-gray-600">Discover and rank federal, state, and local benefits you qualify for</p>
+            </button>
+          </div>
+        </motion.div>
+
         {/* Sticky Filter/Search Bar */}
         <div className="sticky top-0 z-20 bg-white pb-6 -mx-6 px-6 border-b border-gray-100 mb-8">
           {/* Search Bar */}

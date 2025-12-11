@@ -47,6 +47,9 @@ export default function BenefitsScannerPage() {
 
   const [results, setResults] = useState<Benefit[]>([]);
   const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [totalValue, setTotalValue] = useState(0);
 
   const { register, handleSubmit, formState: { errors }, watch } = useForm<Questionnaire>({
     resolver: zodResolver(QuestionnaireSchema),
@@ -54,7 +57,7 @@ export default function BenefitsScannerPage() {
       branch: (preset.branch as Questionnaire["branch"]) || "Army",
       status: "Separated",
       separationType: (preset.dischargeType as Questionnaire["separationType"]) || "honorable",
-      dischargeCode: undefined,
+      dischargeCode: preset.dischargeCode || undefined,
       disabilityRating: "none",
       deployed: "no",
       state: "TN",
@@ -64,157 +67,33 @@ export default function BenefitsScannerPage() {
     },
   });
 
-  function generateBenefits(q: Questionnaire): Benefit[] {
-    // Simple rules mock — replace with real rules engine
-    const out: Benefit[] = [];
-    const isHonorable = q.separationType !== "other-than-honorable";
-    const hasDischargeCode = !!q.dischargeCode && q.separationType !== "honorable";
-    const hasDisability30 = q.disabilityRating === "30-60%" || q.disabilityRating === "70-100%";
-
-    // Education
-    if (isHonorable) {
-      out.push({
-        id: "gi-bill",
-        category: "education",
-        title: "Post-9/11 GI Bill",
-        whyQualified: `Branch: ${q.branch}, separation: ${q.separationType}. Covers in-state tuition + BAH.`,
-        impactUSD: 24000,
-        complexity: "moderate",
-        timeToApply: "~15 minutes",
-        approvalETA: "2–4 weeks",
-        docs: ["DD214","Transcripts (if any)"],
-        links: [{ label: "Apply", url: "https://www.va.gov/education/about-gi-bill-benefits/post-9-11/" }],
-      });
-    }
-
-    if (q.state === "TN") {
-      out.push({
-        id: "tn-strong-act",
-        category: "education",
-        title: "Tennessee STRONG Act (Tuition Waiver)",
-        whyQualified: "State benefit for qualifying veterans; covers public college gaps.",
-        impactUSD: 4200,
-        complexity: "moderate",
-        timeToApply: "~20 minutes",
-        approvalETA: "2–6 weeks",
-        docs: ["Proof of residency","DD214"],
-        links: [{ label: "Program", url: "https://www.tn.gov/" }],
-      });
-    }
-
-    // Housing & Finance
-    if (isHonorable) {
-      out.push({
-        id: "va-home-loan",
-        category: "finance",
-        title: "VA Home Loan",
-        whyQualified: "Eligible with honorable/general discharge.",
-        impactUSD: 15000,
-        complexity: "moderate",
-        timeToApply: "~30 minutes",
-        approvalETA: "Varies",
-        docs: ["COE","Credit report"],
-        links: [{ label: "Overview", url: "https://www.va.gov/housing-assistance/home-loans/" }],
-      });
-    }
-
-    if (hasDisability30 && q.state === "TN") {
-      out.push({
-        id: "property-tax-exemption",
-        category: "finance",
-        title: "TN Property Tax Exemption",
-        whyQualified: "30%+ disability: exempt up to $175k in value.",
-        impactUSD: 1800,
-        complexity: "moderate",
-        timeToApply: "~20 minutes",
-        docs: ["VA rating letter","Proof of homeownership"],
-        links: [{ label: "County Assessor", url: "https://www.tn.gov/" }],
-      });
-    }
-
-    // Career
-    out.push({
-      id: "federal-vet-preference",
-      category: "career",
-      title: "Veterans Employment Preference",
-      whyQualified: "Extra points on federal job applications.",
-      impactUSD: 0,
-      complexity: "easy",
-      timeToApply: "Immediate",
-      docs: ["DD214"],
-      links: [{ label: "USAJOBS", url: "https://www.usajobs.gov/Help/working-in-government/unique-hiring-paths/veterans/" }],
-    });
-
-    // Health
-    if (hasDisability30 || q.deployed?.includes("hazard")) {
-      out.push({
-        id: "va-healthcare",
-        category: "health",
-        title: "VA Health Care Enrollment",
-        whyQualified: "Rating or deployment exposure may qualify.",
-        impactUSD: 2000,
-        complexity: "easy",
-        timeToApply: "~10 minutes",
-        docs: ["DD214","Rating letter"],
-        links: [{ label: "Apply", url: "https://www.va.gov/health-care/how-to-apply/" }],
-      });
-    }
-
-    // Cash & Hidden Money
-    if (q.deployed?.includes("hazard")) {
-      out.push({
-        id: "combat-zone-tax",
-        category: "cash",
-        title: "Combat Zone Tax Refunds",
-        whyQualified: "Combat pay and zone exemptions may apply.",
-        impactUSD: 1000,
-        complexity: "moderate",
-        timeToApply: "~30 minutes",
-        docs: ["Deployment orders","Tax returns"],
-        links: [{ label: "IRS Guidance", url: "https://www.irs.gov/" }],
-      });
-    }
-
-    // Discharge code weighting: if provided and non-honorable, prioritize benefits not requiring honorable
-    if (hasDischargeCode && !isHonorable) {
-      out.forEach(b => {
-        const requiresHonorable = b.id === 'gi-bill' || b.id === 'va-home-loan';
-        if (requiresHonorable) {
-          // Deprioritize
-          b.impactUSD = (b.impactUSD ?? 0) * 0.8;
-        } else {
-          // Slight boost to accessible programs
-          b.impactUSD = Math.round((b.impactUSD ?? 0) * 1.05);
-        }
-        // Add note
-        b.whyQualified += q.dischargeCode ? ` (Consider discharge code ${q.dischargeCode} when applying)` : '';
-      });
-    }
-    return out;
-  }
-
-  function rankByImpact(benefits: Benefit[]): Benefit[] {
-    // Category weighting based on separation/discharge code patterns
-    const sep = watch("separationType") ?? "honorable";
-    const hasCode = !!watch("dischargeCode") && sep !== "honorable";
-    const weights: Record<Benefit["category"], number> = {
-      education: sep === "honorable" ? 1.0 : 0.85,
-      finance: hasCode ? 1.1 : 1.0,
-      health: hasCode ? 1.15 : 1.05,
-      career: sep === "honorable" ? 1.0 : 0.95,
-      cash: hasCode ? 1.1 : 1.0,
-      other: 1.0,
-    } as Record<Benefit["category"], number>;
-    return [...benefits]
-      .map(b => ({ ...b, _score: (b.impactUSD ?? 0) * (weights[b.category] ?? 1.0) }))
-      .sort((a,b) => (b._score ?? 0) - (a._score ?? 0));
-  }
-
-  const onSubmit = (q: Questionnaire) => {
+  const onSubmit = async (q: Questionnaire) => {
+    setLoading(true);
+    setError(null);
+    
     // Persist selected branch into onboarding store for theming synergy
     updateData({ branch: q.branch });
-    const matched = generateBenefits(q);
-    setResults(rankByImpact(matched));
+
+    try {
+      const response = await fetch('/api/scan-benefits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(q),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to scan benefits');
+      }
+
+      const data = await response.json();
+      setResults(data.benefits);
+      setTotalValue(data.totalValue);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error scanning benefits:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const [reminders, setReminders] = useState<{ id: string; when: string }[]>([]);
@@ -344,10 +223,23 @@ export default function BenefitsScannerPage() {
         </section>
 
         <div className="md:col-span-2 flex items-center justify-between">
-          <button type="submit" className="px-4 py-2 border-2 border-gray-200 rounded-md font-medium hover:border-black">Scan Benefits</button>
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="px-4 py-2 border-2 border-gray-200 rounded-md font-medium hover:border-black disabled:opacity-50"
+          >
+            {loading ? 'Scanning...' : 'Scan Benefits'}
+          </button>
           <button type="button" onClick={exportPDF} className="px-4 py-2 border-2 border-gray-200 rounded-md font-medium hover:border-black">Export PDF</button>
         </div>
       </form>
+
+      {/* Error State */}
+      {error && (
+        <div className="mt-6 p-4 border-2 border-red-200 rounded-lg bg-red-50">
+          <p className="text-sm text-red-800">Error: {error}</p>
+        </div>
+      )}
 
       {/* Results Dashboard */}
       {results.length > 0 && (
@@ -398,7 +290,7 @@ export default function BenefitsScannerPage() {
           <section className="p-4 border-2 border-gray-200 rounded-lg">
             <h3 className="font-semibold">How Much Money Am I Leaving on the Table?</h3>
             <p className="text-sm text-gray-600 mb-2">Estimated annual savings/earnings based on eligible benefits.</p>
-            <p className="text-2xl font-bold">${results.reduce((sum, b) => sum + (b.impactUSD ?? 0), 0).toLocaleString()}</p>
+            <p className="text-2xl font-bold">${totalValue.toLocaleString()}</p>
           </section>
         </div>
       )}

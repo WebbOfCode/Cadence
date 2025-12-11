@@ -73,6 +73,16 @@ export function Summary({ onBack }: SummaryProps) {
       const missionPlan = await response.json();
       console.log('Mission plan generated successfully');
       setMissionPlan(missionPlan);
+      
+      // If user has MOS and location, offer to view MOS Scanner
+      if (data.mos && data.location) {
+        const viewScanner = confirm('Your mission plan is ready! Would you like to view personalized career pathways based on your MOS now?');
+        if (viewScanner) {
+          router.push('/mos-scanner');
+          return;
+        }
+      }
+      
       router.push('/dashboard');
     } catch (err) {
       console.error('Failed to generate mission plan:', err);
@@ -146,7 +156,7 @@ export function Summary({ onBack }: SummaryProps) {
           </div>
 
           <div>
-            <p className="text-sm font-medium uppercase tracking-wide text-gray-500">GI Bill</p>
+            <p className="text-sm font-medium uppercase tracking-wide text-gray-500">Education Benefits</p>
             <p className="text-lg mt-1">{data.giBill ? 'Yes' : 'No'}</p>
           </div>
 

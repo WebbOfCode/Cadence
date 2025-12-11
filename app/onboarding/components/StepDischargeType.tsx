@@ -12,6 +12,7 @@ const dischargeSchema = z.object({
   dischargeType: z.enum(['honorable', 'general', 'other-than-honorable', 'bad-conduct', 'dishonorable'], {
     errorMap: () => ({ message: 'Please select your discharge type' }),
   }),
+  dischargeCode: z.string().optional(),
 });
 
 type DischargeFormData = z.infer<typeof dischargeSchema>;
@@ -27,6 +28,7 @@ export function StepDischargeType({ onNext, onBack }: StepDischargeTypeProps) {
     resolver: zodResolver(dischargeSchema),
     defaultValues: {
       dischargeType: (data.dischargeType as any) || undefined,
+      dischargeCode: data.dischargeCode || '',
     },
   });
 
@@ -63,6 +65,7 @@ export function StepDischargeType({ onNext, onBack }: StepDischargeTypeProps) {
   const onSubmit = (formData: DischargeFormData) => {
     updateData({
       dischargeType: formData.dischargeType,
+      dischargeCode: formData.dischargeCode || undefined,
     });
     onNext();
   };
@@ -115,6 +118,29 @@ export function StepDischargeType({ onNext, onBack }: StepDischargeTypeProps) {
             </motion.label>
           ))}
         </div>
+
+        {/* Discharge Code (Optional - for non-honorable discharges) */}
+        {selectedType && selectedType !== 'honorable' && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="space-y-2"
+          >
+            <label htmlFor="dischargeCode" className="block text-sm font-medium">
+              Discharge Code (Optional)
+            </label>
+            <input
+              id="dischargeCode"
+              type="text"
+              placeholder="e.g., RE-3, JKA, etc."
+              {...register('dischargeCode')}
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+            />
+            <p className="text-xs text-gray-600">
+              If you have a specific discharge code (RE code, separation code, etc.), enter it here. This helps us provide more targeted benefit guidance.
+            </p>
+          </motion.div>
+        )}
 
         {errors.dischargeType && (
           <div className="p-4 bg-red-50 border-2 border-red-200 rounded-lg">
