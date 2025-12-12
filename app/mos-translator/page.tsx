@@ -64,7 +64,9 @@ export default function MOSTranslatorPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+      <h1 className="text-xl md:text-2xl font-bold">MOS Translator</h1>
+      <p className="text-xs md:text-sm text-gray-600 mt-1">Discover career paths, salaries, certifications, and resume bullets for your MOS</p>
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -88,7 +90,7 @@ export default function MOSTranslatorPage() {
             <p className="text-xs text-gray-500 mt-1">Add if you hold multiple MOS designations</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div>
             <label className="text-sm font-medium">ZIP Code</label>
             <input
@@ -100,7 +102,7 @@ export default function MOSTranslatorPage() {
               <p className="text-xs text-red-600 mt-1">{errors.zip.message}</p>
             )}
           </div>
-          <div className="flex items-end">
+          <div className="flex flex-col justify-end">
             <button
               type="submit"
               className="w-full px-4 py-2 border-2 border-gray-200 rounded-md font-medium hover:border-black disabled:opacity-50"
@@ -125,12 +127,12 @@ export default function MOSTranslatorPage() {
       )}
 
       {results && (
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6">
           {/* Real job titles */}
-          <section className="p-4 border-2 border-gray-200 rounded-lg">
-            <h2 className="font-semibold">Real Job Titles</h2>
+          <section className="p-3 md:p-4 border-2 border-gray-200 rounded-lg">
+            <h2 className="text-sm md:text-base font-semibold">Real Job Titles</h2>
             <p className="text-xs text-gray-600 mb-2">Roles veterans with this MOS actually get hired for.</p>
-            <ul className="list-disc ml-5 space-y-1">
+            <ul className="list-disc ml-5 space-y-1 text-sm">
               {results.jobTitles.map((t) => (
                 <li key={t}>{t}</li>
               ))}
@@ -138,14 +140,14 @@ export default function MOSTranslatorPage() {
           </section>
 
           {/* Local salaries */}
-          <section className="p-4 border-2 border-gray-200 rounded-lg">
-            <h2 className="font-semibold">Average Salary in {zipCode}</h2>
+          <section className="p-3 md:p-4 border-2 border-gray-200 rounded-lg">
+            <h2 className="text-sm md:text-base font-semibold">Average Salary in {zipCode}</h2>
             <p className="text-xs text-gray-600 mb-2">Based on local market data.</p>
             <ul className="space-y-2">
               {results.avgSalary.map((s) => (
-                <li key={s.title} className="flex items-center justify-between">
+                <li key={s.title} className="flex items-center justify-between text-sm">
                   <span>{s.title}</span>
-                  <span className="font-mono">${s.amount.toLocaleString()}</span>
+                  <span className="font-mono text-xs md:text-sm">${s.amount.toLocaleString()}</span>
                 </li>
               ))}
             </ul>
@@ -153,8 +155,8 @@ export default function MOSTranslatorPage() {
           </section>
 
           {/* Skills gaps */}
-          <section className="p-4 border-2 border-gray-200 rounded-lg">
-            <h2 className="font-semibold">Skills Gaps</h2>
+          <section className="p-3 md:p-4 border-2 border-gray-200 rounded-lg">
+            <h2 className="text-sm md:text-base font-semibold">Skills Gaps</h2>
             <p className="text-xs text-gray-600 mb-2">You may be missing these industry credentials or skills.</p>
             <div className="flex flex-wrap gap-2">
               {results.skillGaps.map((g) => (
@@ -166,19 +168,19 @@ export default function MOSTranslatorPage() {
           </section>
 
           {/* Cert pathways */}
-          <section className="p-4 border-2 border-gray-200 rounded-lg">
-            <h2 className="font-semibold">Cert Pathways</h2>
+          <section className="p-3 md:p-4 border-2 border-gray-200 rounded-lg">
+            <h2 className="text-sm md:text-base font-semibold">Cert Pathways</h2>
             <p className="text-xs text-gray-600 mb-2">Time, cost, and providers mapped out.</p>
             <ul className="space-y-2">
               {results.certPaths.map((c) => (
-                <li key={c.name} className="border rounded p-2 flex items-center justify-between">
+                <li key={c.name} className="border rounded p-2 flex items-center justify-between text-sm">
                   <div>
-                    <p className="font-medium">{c.name}</p>
+                    <p className="font-medium text-sm">{c.name}</p>
                     <p className="text-xs text-gray-600">Provider: {c.provider}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm">{c.timeWeeks} weeks</p>
-                    <p className="text-sm font-mono">${c.costUSD.toLocaleString()}</p>
+                    <p className="text-xs md:text-sm">{c.timeWeeks} weeks</p>
+                    <p className="text-xs md:text-sm font-mono">${c.costUSD.toLocaleString()}</p>
                   </div>
                 </li>
               ))}
@@ -186,8 +188,8 @@ export default function MOSTranslatorPage() {
           </section>
 
           {/* One-click resume bullets */}
-          <section className="p-4 border-2 border-gray-200 rounded-lg lg:col-span-2">
-            <h2 className="font-semibold">One-Click Resume Bullets</h2>
+          <section className="p-3 md:p-4 border-2 border-gray-200 rounded-lg md:col-span-2 lg:col-span-2">
+            <h2 className="text-sm md:text-base font-semibold">One-Click Resume Bullets</h2>
             <p className="text-xs text-gray-600 mb-2">Translated from military → civilian terminology.</p>
             <ul className="space-y-2">
               {results.resumeBullets.map((b, i) => (

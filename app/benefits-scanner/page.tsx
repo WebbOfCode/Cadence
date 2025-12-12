@@ -127,11 +127,11 @@ export default function BenefitsScannerPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      <h1 className="text-2xl font-bold">Veteran Benefits Scanner</h1>
-      <p className="text-sm text-gray-600 mt-1">Answer ~10 smart questions. We rank federal, state, county, and nonprofit benefits you qualify for — with impact and steps.</p>
+      <h1 className="text-xl md:text-2xl font-bold">Veteran Benefits Scanner</h1>
+      <p className="text-xs md:text-sm text-gray-600 mt-1">Answer ~10 smart questions. We rank federal, state, county, and nonprofit benefits you qualify for — with impact and steps.</p>
 
       {/* Questionnaire */}
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         <section className="p-4 border-2 border-gray-200 rounded-lg">
           <h2 className="font-semibold mb-3">Core Inputs</h2>
           {/* Branch */}
@@ -183,7 +183,7 @@ export default function BenefitsScannerPage() {
 
         <section className="p-4 border-2 border-gray-200 rounded-lg">
           <h2 className="font-semibold mb-3">Location, Education, Employment</h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="text-sm font-medium">State</label>
               <input className="mt-1 w-full border-2 rounded-md px-3 py-2" placeholder="e.g., TN" {...register("state")} />
@@ -204,7 +204,7 @@ export default function BenefitsScannerPage() {
             {(["unemployed","full-time","part-time","disabled"] as const).map(s => <option key={s} value={s}>{s}</option>)}
           </select>
 
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
             {(
               [
                 { key: "combatDecorations", label: "Combat decorations?" },
@@ -222,15 +222,15 @@ export default function BenefitsScannerPage() {
           </div>
         </section>
 
-        <div className="md:col-span-2 flex items-center justify-between">
+        <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
           <button 
             type="submit" 
             disabled={loading}
-            className="px-4 py-2 border-2 border-gray-200 rounded-md font-medium hover:border-black disabled:opacity-50"
+            className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-md font-medium hover:border-black disabled:opacity-50"
           >
             {loading ? 'Scanning...' : 'Scan Benefits'}
           </button>
-          <button type="button" onClick={exportPDF} className="px-4 py-2 border-2 border-gray-200 rounded-md font-medium hover:border-black">Export PDF</button>
+          <button type="button" onClick={exportPDF} className="flex-1 px-4 py-2 border-2 border-gray-200 rounded-md font-medium hover:border-black">Export PDF</button>
         </div>
       </form>
 
@@ -249,7 +249,7 @@ export default function BenefitsScannerPage() {
             <p className="text-sm text-gray-600">Saved: {savedIds.length}</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6">
             {results.map((b) => (
               <section key={b.id} className="p-4 border-2 border-gray-200 rounded-lg">
                 <div className="flex items-start justify-between">

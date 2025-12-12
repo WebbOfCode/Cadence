@@ -211,7 +211,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
         {/* Header */}
         <div className="mb-12 flex items-start justify-between">
           <div>
@@ -248,7 +248,7 @@ export default function DashboardPage() {
           className="mb-8 p-6 bg-gradient-to-r from-gray-50 to-white border-2 border-gray-200 rounded-lg"
         >
           <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-4">Priority Status</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
             <div>
               <p className="text-xs text-gray-600 mb-1">High Priority</p>
               <p className="text-2xl font-bold">{highPriorityCompleted}/{highPriorityTasks.length}</p>
@@ -265,7 +265,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-8 md:mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
