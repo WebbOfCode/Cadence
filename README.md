@@ -23,11 +23,19 @@ npm install
 
 ### 2. Set Up Environment Variables
 
-Create a `.env.local` file:
+Create a `.env.local` file (copy from `.env.example`):
+
+```bash
+cp .env.example .env.local
+```
+
+Then add your OpenAI API key:
 
 ```
-OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_API_KEY=sk-your-actual-api-key-here
 ```
+
+Get your API key from: https://platform.openai.com/api-keys
 
 ### 3. Run Development Server
 
@@ -46,8 +54,12 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
     page.tsx           # Main onboarding page
   /dashboard           # Personalized mission dashboard
     page.tsx
+  /housing-finder      # Apartment & Home Finder
+    page.tsx
   /api
     /guide             # AI mission plan generation
+      route.ts
+    /housing           # Housing search API
       route.ts
 /lib
   types.ts             # TypeScript interfaces
@@ -80,6 +92,12 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 - Progress visualization
 - Deadline tracking
 - Clean, athletic design
+
+### Housing Finder
+- Veteran-friendly apartment and home search
+- Filter by location, budget, bedrooms, pet-friendly, accessibility, and voucher support
+- Results prioritized by affordability and match
+- Route: `/housing-finder`
 
 ## Design Philosophy
 

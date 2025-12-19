@@ -149,7 +149,7 @@ export function StepGoal({ onNext, onBack }: StepGoalProps) {
             <label
               key={goal.value}
               className={`
-                flex flex-col p-6 border-2 rounded-lg cursor-pointer transition-all
+                flex flex-col p-4 md:p-6 border-2 rounded-lg cursor-pointer transition-all
                 ${selectedGoal === goal.value 
                   ? 'border-black bg-black text-white' 
                   : 'border-gray-200 hover:border-gray-400'
@@ -162,8 +162,8 @@ export function StepGoal({ onNext, onBack }: StepGoalProps) {
                 {...register('goal')}
                 className="sr-only"
               />
-              <span className="text-lg font-medium">{goal.label}</span>
-              <span className={`text-sm mt-1 ${selectedGoal === goal.value ? 'text-gray-200' : 'text-gray-600'}`}>
+              <span className="text-base md:text-lg font-medium">{goal.label}</span>
+              <span className={`text-xs md:text-sm mt-1 ${selectedGoal === goal.value ? 'text-gray-200' : 'text-gray-600'}`}>
                 {goal.description}
               </span>
             </label>
@@ -189,17 +189,17 @@ export function StepGoal({ onNext, onBack }: StepGoalProps) {
                   {subGoals.career.map((sub) => (
                     <label
                       key={sub.value}
-                      className="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 cursor-pointer transition-colors"
+                      className="flex items-center gap-3 p-3 md:p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 cursor-pointer transition-colors"
                     >
                       <input
                         type="radio"
                         value={sub.value}
                         {...register('careerPath')}
-                        className="mt-1 w-4 h-4"
+                        className="w-5 h-5 md:w-4 md:h-4 cursor-pointer flex-shrink-0"
                       />
-                      <div>
-                        <div className="font-semibold">{sub.label}</div>
-                        <div className="text-sm text-gray-600">{sub.description}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm md:text-base">{sub.label}</div>
+                        <div className="text-xs md:text-sm text-gray-600">{sub.description}</div>
                       </div>
                     </label>
                   ))}
@@ -211,17 +211,17 @@ export function StepGoal({ onNext, onBack }: StepGoalProps) {
                   {subGoals.education.map((sub) => (
                     <label
                       key={sub.value}
-                      className="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 cursor-pointer transition-colors"
+                      className="flex items-center gap-3 p-3 md:p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 cursor-pointer transition-colors"
                     >
                       <input
                         type="radio"
                         value={sub.value}
                         {...register('educationPath')}
-                        className="mt-1 w-4 h-4"
+                        className="w-5 h-5 md:w-4 md:h-4 cursor-pointer flex-shrink-0"
                       />
-                      <div>
-                        <div className="font-semibold">{sub.label}</div>
-                        <div className="text-sm text-gray-600">{sub.description}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm md:text-base">{sub.label}</div>
+                        <div className="text-xs md:text-sm text-gray-600">{sub.description}</div>
                       </div>
                     </label>
                   ))}
@@ -233,17 +233,17 @@ export function StepGoal({ onNext, onBack }: StepGoalProps) {
                   {subGoals.housing.map((sub) => (
                     <label
                       key={sub.value}
-                      className="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 cursor-pointer transition-colors"
+                      className="flex items-center gap-3 p-3 md:p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 cursor-pointer transition-colors"
                     >
                       <input
                         type="radio"
                         value={sub.value}
                         {...register('housingPath')}
-                        className="mt-1 w-4 h-4"
+                        className="w-5 h-5 md:w-4 md:h-4 cursor-pointer flex-shrink-0"
                       />
-                      <div>
-                        <div className="font-semibold">{sub.label}</div>
-                        <div className="text-sm text-gray-600">{sub.description}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm md:text-base">{sub.label}</div>
+                        <div className="text-xs md:text-sm text-gray-600">{sub.description}</div>
                       </div>
                     </label>
                   ))}
@@ -259,7 +259,7 @@ export function StepGoal({ onNext, onBack }: StepGoalProps) {
                       {subGoals.finance.map((sub) => (
                         <label
                           key={sub.value}
-                          className="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 cursor-pointer transition-colors"
+                          className="flex items-center gap-3 p-3 md:p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 cursor-pointer transition-colors"
                         >
                           <input
                             type="checkbox"
@@ -272,11 +272,11 @@ export function StepGoal({ onNext, onBack }: StepGoalProps) {
                                 field.onChange(current.filter(v => v !== sub.value));
                               }
                             }}
-                            className="mt-1 w-4 h-4"
+                            className="w-5 h-5 md:w-4 md:h-4 cursor-pointer flex-shrink-0"
                           />
-                          <div>
-                            <div className="font-semibold">{sub.label}</div>
-                            <div className="text-sm text-gray-600">{sub.description}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-sm md:text-base">{sub.label}</div>
+                            <div className="text-xs md:text-sm text-gray-600">{sub.description}</div>
                           </div>
                         </label>
                       ))}
@@ -294,7 +294,7 @@ export function StepGoal({ onNext, onBack }: StepGoalProps) {
                       {subGoals.wellness.map((sub) => (
                         <label
                           key={sub.value}
-                          className="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 cursor-pointer transition-colors"
+                          className="flex items-center gap-3 p-3 md:p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 cursor-pointer transition-colors"
                         >
                           <input
                             type="checkbox"
@@ -307,11 +307,11 @@ export function StepGoal({ onNext, onBack }: StepGoalProps) {
                                 field.onChange(current.filter(v => v !== sub.value));
                               }
                             }}
-                            className="mt-1 w-4 h-4"
+                            className="w-5 h-5 md:w-4 md:h-4 cursor-pointer flex-shrink-0"
                           />
-                          <div>
-                            <div className="font-semibold">{sub.label}</div>
-                            <div className="text-sm text-gray-600">{sub.description}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-sm md:text-base">{sub.label}</div>
+                            <div className="text-xs md:text-sm text-gray-600">{sub.description}</div>
                           </div>
                         </label>
                       ))}

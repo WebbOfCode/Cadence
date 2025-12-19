@@ -13,7 +13,7 @@ import { getCategoryIcon, type TaskCategory } from '@/lib/categoryIcons';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { data, missionPlan, updateTaskCompletion } = useOnboardingStore();
+  const { data, missionPlan, updateTaskCompletion, addTask, updateData } = useOnboardingStore();
   const [filter, setFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all');
   const [selectedTask, setSelectedTask] = useState<MissionTask | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,6 +27,135 @@ export default function DashboardPage() {
       return;
     }
   }, [missionPlan, router]);
+
+  // Inject NCO Guidance tasks (behavioral nudges) based on key triggers
+  useEffect(() => {
+    if (!missionPlan) return;
+
+    // Discharge Upgrade
+    const isNonHonorable = data.dischargeType && data.dischargeType !== 'honorable';
+    if (isNonHonorable && !missionPlan.tasks.some(t => t.id === 'task-discharge-upgrade')) {
+      addTask({
+        id: 'task-discharge-upgrade',
+        title: 'File Discharge Upgrade Request',
+        description:
+          'Discharge upgrades are common and applying does not reduce current benefits or harm VA claims. Many veterans succeed years after separation using new evidence, time passed, or inequities. Opens access to VA healthcare, education, home loans, and hiring preferences.',
+        category: 'admin',
+        priority: 'high',
+        completed: false,
+        steps: [
+          'Gather records and new evidence (medical, character references, policy changes)',
+          'Write a personal statement explaining circumstances and growth',
+          'Within 15 years: file DD Form 293; after 15 years: file DD Form 149',
+          'Work with a VSO (DAV, VFW, American Legion)',
+          'Submit and monitor; typical processing 3–6 months',
+        ],
+        notes: 'Cadence provides guidance, not legal advice. No guarantees of approval.'
+      });
+      updateData({ dischargeUpgradeNudge: true });
+    }
+
+    // VA Healthcare Enrollment (common delay): if within 180 days of ETS or recently separated
+    const daysUntilETS = data.etsDate ? getDaysUntilETS(data.etsDate) : undefined;
+    if (daysUntilETS !== undefined && daysUntilETS <= 180 && !missionPlan.tasks.some(t => t.id === 'task-va-healthcare-enroll')) {
+      addTask({
+        id: 'task-va-healthcare-enroll',
+        title: 'Enroll in VA Healthcare',
+        description:
+          'Enroll early to establish care and coverage. Many delay this and miss benefits. Enrollment does not affect disability claims and provides access to primary and specialty care.',
+        category: 'healthcare',
+        priority: 'high',
+        completed: false,
+        steps: [
+          'Gather DD-214 and ID',
+          'Create VA.gov account and enroll in VA Healthcare (Form 10-10EZ)',
+          'Pick a local VA facility and schedule an intake',
+        ],
+        notes: 'Guidance only, not legal advice. No guarantees.'
+      });
+      updateData({ vaHealthcareNudge: true });
+    }
+
+    // Disability Claim (common delay): if not claimed
+    if (data.disabilityClaim === false && !missionPlan.tasks.some(t => t.id === 'task-va-disability-claim')) {
+      addTask({
+        id: 'task-va-disability-claim',
+        title: 'File Initial VA Disability Claim',
+        description:
+          'Filing a claim is low-risk and common. You can submit a fully developed claim or intent to file. This does not harm existing benefits and can be updated with new evidence.',
+        category: 'finance',
+        priority: 'high',
+        completed: false,
+        steps: [
+          'Gather medical records and service treatment records',
+          'File VA Form 21-526EZ (Disability Claim) on VA.gov',
+          'Consider VSO support (DAV, VFW, American Legion)',
+        ],
+        notes: 'Guidance only, not legal advice. No guarantees.'
+      });
+      updateData({ disabilityClaimNudge: true });
+    }
+
+    // GI Bill (common delay): if education goal and giBill not active
+    if (data.goal === 'education' && data.giBill === false && !missionPlan.tasks.some(t => t.id === 'task-gi-bill-apply')) {
+      addTask({
+        id: 'task-gi-bill-apply',
+        title: 'Apply for GI Bill Benefits',
+        description:
+          'Using your GI Bill can cover tuition and housing. Many wait too long to start. Application is straightforward and does not affect other benefits adversely.',
+        category: 'education',
+        priority: 'high',
+        completed: false,
+        steps: [
+          'Choose a school or training program',
+          'Apply on VA.gov (Education Benefits)',
+          'Submit Certificate of Eligibility to your school',
+        ],
+        notes: 'Guidance only, not legal advice. No guarantees.'
+      });
+      updateData({ giBillNudge: true });
+    }
+
+    // VA Loan COE (housing goal): encourage certificate of eligibility
+    if (data.goal === 'housing' && !missionPlan.tasks.some(t => t.id === 'task-va-loan-coe')) {
+      addTask({
+        id: 'task-va-loan-coe',
+        title: 'Request VA Loan Certificate of Eligibility (COE)',
+        description:
+          'COE unlocks VA home loan benefits. Requesting it is quick and common to do early. No impact on other benefits.',
+        category: 'housing',
+        priority: 'medium',
+        completed: false,
+        steps: [
+          'Create VA.gov account and request COE',
+          'Download COE and share with lender when ready',
+        ],
+        notes: 'Guidance only, not legal advice.'
+      });
+      updateData({ vaLoanNudge: true });
+    }
+
+    // TSP Rollover (finance goal): encourage early planning
+    if (data.goal === 'finance' && !missionPlan.tasks.some(t => t.id === 'task-tsp-rollover')) {
+      addTask({
+        id: 'task-tsp-rollover',
+        title: 'Plan TSP Rollover or Withdrawal Strategy',
+        description:
+          'Decide whether to keep TSP, roll it into an IRA, or withdraw. Many delay this decision—planning early avoids tax surprises and preserves retirement savings.',
+        category: 'finance',
+        priority: 'high',
+        completed: false,
+        steps: [
+          'Review TSP balance and investment allocation',
+          'Research rollover options (Traditional IRA, Roth IRA, keep in TSP)',
+          'Consult with a financial advisor or TSP representative',
+          'Decide on rollover or withdrawal timeline',
+        ],
+        notes: 'Guidance only, not financial or legal advice.'
+      });
+      updateData({ tspRolloverNudge: true });
+    }
+  }, [missionPlan, data.dischargeType, data.etsDate, data.disabilityClaim, data.giBill, data.goal, addTask, updateData]);
 
   if (!missionPlan || !data.name) {
     return null;
@@ -239,6 +368,171 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
+
+        {/* Discharge Upgrade Banner (Behavioral UX) */}
+        {data.dischargeType && data.dischargeType !== 'honorable' && !data.dischargeUpgradeBannerDismissed && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.03 }}
+            className="mb-6 p-6 border-2 border-amber-300 bg-amber-50 rounded-lg"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <h2 className="text-lg font-bold text-gray-900 mb-1">NCO Guidance: Try a Discharge Upgrade</h2>
+                <p className="text-sm text-gray-700 mb-2">
+                  Discharge upgrades are <strong>common</strong> and applying <strong>does not</strong> reduce current benefits or harm VA claims. Many veterans succeed years after separation using new evidence, time passed, or inequities.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <a href="https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0293.pdf" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">DD Form 293</a>
+                  <a href="https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0149.pdf" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">DD Form 149</a>
+                  <a href="https://www.dav.org/find-your-local-dav-office/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">Find DAV Office</a>
+                </div>
+                <p className="text-xs text-gray-600 mt-3">Cadence provides guidance, not legal advice. No guarantees of approval.</p>
+              </div>
+              <div className="flex-shrink-0">
+                <button
+                  onClick={() => updateData({ dischargeUpgradeBannerDismissed: true })}
+                  className="px-3 py-2 text-sm border-2 border-gray-300 rounded hover:border-gray-400"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Disability Claim Banner */}
+        {data.disabilityClaim === false && !(data.ncoBannerDismissedKeys || []).includes('disability-claim') && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.04 }}
+            className="mb-6 p-6 border-2 border-amber-300 bg-amber-50 rounded-lg"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <h2 className="text-lg font-bold text-gray-900 mb-1">NCO Guidance: File Your Disability Claim</h2>
+                <p className="text-sm text-gray-700 mb-2">
+                  Filing is <strong>common</strong> and <strong>low-risk</strong>. It won’t hurt existing benefits, and you can add evidence later. Many veterans wait—don’t miss out.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <a href="https://www.va.gov/disability/how-to-file-claim/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">File on VA.gov</a>
+                  <a href="https://www.dav.org/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">DAV Help</a>
+                  <a href="https://www.vfw.org/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">VFW Support</a>
+                </div>
+                <p className="text-xs text-gray-600 mt-3">Cadence provides guidance, not legal advice. No guarantees of approval.</p>
+              </div>
+              <div className="flex-shrink-0">
+                <button
+                  onClick={() => updateData({ ncoBannerDismissedKeys: [ ...(data.ncoBannerDismissedKeys || []), 'disability-claim' ] })}
+                  className="px-3 py-2 text-sm border-2 border-gray-300 rounded hover:border-gray-400"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* VA Healthcare Banner */}
+        {(() => {
+          const daysUntilETS = data.etsDate ? getDaysUntilETS(data.etsDate) : undefined;
+          return daysUntilETS !== undefined && daysUntilETS <= 180 && !(data.ncoBannerDismissedKeys || []).includes('va-healthcare');
+        })() && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="mb-6 p-6 border-2 border-amber-300 bg-amber-50 rounded-lg"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <h2 className="text-lg font-bold text-gray-900 mb-1">NCO Guidance: Enroll in VA Healthcare</h2>
+                <p className="text-sm text-gray-700 mb-2">
+                  Enrollment is straightforward and many delay it. Starting care early helps with continuity and claims. Enrollment does not harm other benefits.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <a href="https://www.va.gov/health-care/how-to-apply/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">Apply on VA.gov</a>
+                  <a href="https://www.va.gov/find-locations/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">Find VA Facility</a>
+                </div>
+                <p className="text-xs text-gray-600 mt-3">Cadence provides guidance, not legal advice.</p>
+              </div>
+              <div className="flex-shrink-0">
+                <button
+                  onClick={() => updateData({ ncoBannerDismissedKeys: [ ...(data.ncoBannerDismissedKeys || []), 'va-healthcare' ] })}
+                  className="px-3 py-2 text-sm border-2 border-gray-300 rounded hover:border-gray-400"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* GI Bill Banner */}
+        {data.goal === 'education' && data.giBill === false && !(data.ncoBannerDismissedKeys || []).includes('gi-bill') && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.06 }}
+            className="mb-6 p-6 border-2 border-amber-300 bg-amber-50 rounded-lg"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <h2 className="text-lg font-bold text-gray-900 mb-1">NCO Guidance: Use Your GI Bill</h2>
+                <p className="text-sm text-gray-700 mb-2">
+                  Education benefits are powerful. Many wait to apply—don’t. Applying is simple and does not negatively affect other benefits.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <a href="https://www.va.gov/education/how-to-apply/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">Apply on VA.gov</a>
+                  <a href="https://www.benefits.va.gov/gibill/comparison_tool.asp" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">GI Bill Comparison Tool</a>
+                </div>
+                <p className="text-xs text-gray-600 mt-3">Cadence provides guidance, not legal advice.</p>
+              </div>
+              <div className="flex-shrink-0">
+                <button
+                  onClick={() => updateData({ ncoBannerDismissedKeys: [ ...(data.ncoBannerDismissedKeys || []), 'gi-bill' ] })}
+                  className="px-3 py-2 text-sm border-2 border-gray-300 rounded hover:border-gray-400"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* VA Loan COE Banner */}
+        {data.goal === 'housing' && !(data.ncoBannerDismissedKeys || []).includes('va-loan-coe') && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.07 }}
+            className="mb-6 p-6 border-2 border-amber-300 bg-amber-50 rounded-lg"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <h2 className="text-lg font-bold text-gray-900 mb-1">NCO Guidance: Request Your VA Loan COE</h2>
+                <p className="text-sm text-gray-700 mb-2">
+                  Getting your Certificate of Eligibility early keeps home options open. It’s quick and does not affect other benefits.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <a href="https://www.va.gov/housing-assistance/home-loans/request-coe-form-26-1880/introduction" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">Request COE</a>
+                  <a href="https://www.va.gov/housing-assistance/home-loans/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">VA Loan Guide</a>
+                </div>
+                <p className="text-xs text-gray-600 mt-3">Cadence provides guidance, not legal advice.</p>
+              </div>
+              <div className="flex-shrink-0">
+                <button
+                  onClick={() => updateData({ ncoBannerDismissedKeys: [ ...(data.ncoBannerDismissedKeys || []), 'va-loan-coe' ] })}
+                  className="px-3 py-2 text-sm border-2 border-gray-300 rounded hover:border-gray-400"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Priority Breakdown */}
         <motion.div

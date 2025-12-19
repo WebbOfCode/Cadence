@@ -17,6 +17,7 @@ export type DischargeType =
   | 'honorable'
   | 'general'
   | 'other-than-honorable'
+  | 'entry-level'
   | 'bad-conduct'
   | 'dishonorable';
 
@@ -39,6 +40,17 @@ export interface OnboardingData {
   giBill: boolean;
   dischargeType?: DischargeType;
   dischargeCode?: string; // Optional discharge code (RE-3, JKA, etc.) for non-honorable discharges
+  // Behavioral UX flags
+  dischargeUpgradeNudge?: boolean; // Persist recommendation to file a discharge upgrade
+  dischargeUpgradeBannerDismissed?: boolean; // User dismissed the dashboard banner (task remains)
+  // Generalized NCO banners dismiss list
+  ncoBannerDismissedKeys?: string[]; // e.g., ['disability-claim','va-healthcare','gi-bill','va-loan-coe','tsp-rollover']
+  // Additional nudges
+  vaHealthcareNudge?: boolean;
+  disabilityClaimNudge?: boolean;
+  giBillNudge?: boolean;
+  vaLoanNudge?: boolean;
+  tspRolloverNudge?: boolean;
   // Awards and decorations - used for tailoring recommendations and resume prompts
   hasAwards: boolean;
   awards: string[]; // Selected awards from predefined list
