@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { MissionTask } from '@/lib/types';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { formatDate } from '@/lib/utils';
-import { X, Edit2, Check } from 'lucide-react';
+import { X, Edit2, Check, Clock } from 'lucide-react';
 import { useOnboardingStore } from '@/lib/useOnboardingStore';
 import { getCategoryIcon, type TaskCategory } from '@/lib/categoryIcons';
 
@@ -52,6 +52,38 @@ export function TaskDetailDrawer({ task, onClose, userMOS, timeInService, discha
       wellness: 'Wellness',
     };
     return labels[category] || category;
+  };
+
+  const getComplexityScore = (missionTask: MissionTask) => {
+    const stepWeight = (missionTask.steps?.length || 1) * 12;
+    const priorityWeight = missionTask.priority === 'high' ? 40 : missionTask.priority === 'medium' ? 25 : 10;
+    const coreWeight = missionTask.core ? 8 : 0;
+    return Math.min(100, stepWeight + priorityWeight + coreWeight);
+  };
+
+  const getComplexityLabel = (score: number) => {
+    if (score >= 75) return 'Heavy lift';
+    if (score >= 45) return 'Moderate effort';
+    return 'Quick win';
+  };
+
+  const getBarTone = (score: number) => {
+    if (score >= 75) return 'bg-red-500';
+    if (score >= 45) return 'bg-amber-500';
+    return 'bg-emerald-500';
+  };
+
+  const getTimelineMeta = (missionTask: MissionTask) => {
+    if (missionTask.deadline) {
+      const daysLeft = Math.ceil((new Date(missionTask.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+      const horizon = Math.max(14, Math.min(120, daysLeft + 30));
+      const score = Math.max(0, Math.min(100, 100 - (daysLeft / horizon) * 100));
+      const label = daysLeft <= 0 ? 'Overdue' : `${daysLeft} days left`;
+      return { score, label };
+    }
+
+    const fallbackScore = missionTask.priority === 'high' ? 70 : missionTask.priority === 'medium' ? 45 : 30;
+    return { score: fallbackScore, label: 'No deadline set' };
   };
 
   return (
@@ -111,6 +143,38 @@ export function TaskDetailDrawer({ task, onClose, userMOS, timeInService, discha
           <section>
             <h3 className="text-lg font-bold mb-3">Details</h3>
             <p className="text-gray-700 leading-relaxed">{task.description}</p>
+          </section>
+
+          <section>
+            {(() => {
+              const complexityScore = getComplexityScore(task);
+              const timeline = getTimelineMeta(task);
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg border border-gray-200">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Complexity</p>
+                    <div className="flex items-center justify-between text-sm text-gray-700 mb-1">
+                      <span>{getComplexityLabel(complexityScore)}</span>
+                      <span className="font-semibold text-gray-900">{complexityScore}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                      <div className={`h-full ${getBarTone(complexityScore)} rounded-full`} style={{ width: `${complexityScore}%` }} />
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-lg border border-gray-200">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Time</p>
+                    <div className="flex items-center justify-between text-sm text-gray-700 mb-1">
+                      <span className="flex items-center gap-1"><Clock size={14} /> Timeline</span>
+                      <span className="font-semibold text-gray-900">{timeline.score}%</span>
+                    </div>
+                    <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                      <div className={`h-full ${getBarTone(timeline.score)} rounded-full`} style={{ width: `${timeline.score}%` }} />
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1">{timeline.label}</p>
+                  </div>
+                </div>
+              );
+            })()}
           </section>
 
           {/* Steps Section */}

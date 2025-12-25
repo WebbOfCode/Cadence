@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useOnboardingStore } from "@/lib/useOnboardingStore";
 import type { MilitaryBranch } from "@/lib/types";
 
@@ -18,7 +18,15 @@ export default function BranchSwitcher({ compact = false }: { compact?: boolean 
   const updateData = useOnboardingStore((s) => s.updateData);
   const current = data.branch;
 
-  const label = useMemo(() => (compact ? "Branch" : "Preview as branch"), [compact]);
+  const label = useMemo(() => (compact ? "Branch" : "Your service branch"), [compact]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("cadence-preferred-branch") as MilitaryBranch | null;
+    if (!current && stored) {
+      updateData({ branch: stored });
+    }
+  }, [current, updateData]);
 
   return (
     <div className="flex items-center gap-2">
@@ -28,7 +36,13 @@ export default function BranchSwitcher({ compact = false }: { compact?: boolean 
       <select
         id="branch-switcher"
         value={current ?? ""}
-        onChange={(e) => updateData({ branch: e.target.value as MilitaryBranch })}
+        onChange={(e) => {
+          const nextBranch = e.target.value as MilitaryBranch;
+          updateData({ branch: nextBranch });
+          if (typeof window !== "undefined") {
+            localStorage.setItem("cadence-preferred-branch", nextBranch);
+          }
+        }}
         className="text-sm border-2 rounded-md px-2 py-1 bg-white text-black border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-gray-300"
       >
         <option value="" disabled>

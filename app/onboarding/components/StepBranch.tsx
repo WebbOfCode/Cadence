@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -18,13 +20,13 @@ interface StepBranchProps {
   onBack: () => void;
 }
 
-const branches: MilitaryBranch[] = [
-  'Army',
-  'Navy',
-  'Air Force',
-  'Marine Corps',
-  'Coast Guard',
-  'Space Force',
+const branchCards: { name: MilitaryBranch; logo: string; tagline: string }[] = [
+  { name: 'Army', logo: '/branch-logos/army.svg', tagline: 'Soldiers & Warrant Officers' },
+  { name: 'Navy', logo: '/branch-logos/navy.svg', tagline: 'Sailors & Chiefs' },
+  { name: 'Air Force', logo: '/branch-logos/air-force.svg', tagline: 'Airmen & Guardians-to-be' },
+  { name: 'Marine Corps', logo: '/branch-logos/marine-corps.svg', tagline: 'Marines & Veterans' },
+  { name: 'Coast Guard', logo: '/branch-logos/coast-guard.svg', tagline: 'Coasties & Reservists' },
+  { name: 'Space Force', logo: '/branch-logos/space-force.svg', tagline: 'Guardians' },
 ];
 
 export function StepBranch({ onNext, onBack }: StepBranchProps) {
@@ -34,6 +36,7 @@ export function StepBranch({ onNext, onBack }: StepBranchProps) {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { isValid },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -43,7 +46,35 @@ export function StepBranch({ onNext, onBack }: StepBranchProps) {
     },
   });
 
+      useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const stored = localStorage.getItem('cadence-preferred-branch') as MilitaryBranch | null;
+        if (!data.branch && stored) {
+          setValue('branch', stored, { shouldValidate: true });
+          updateData({ branch: stored });
+        }
+      }, [data.branch, setValue, updateData]);
+
+      useEffect(() => {
+        if (!selectedBranch) return;
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('cadence-preferred-branch', selectedBranch);
+        }
+        updateData({ branch: selectedBranch });
+      }, [selectedBranch, updateData]);
+
   const selectedBranch = watch('branch');
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = localStorage.getItem('cadence-preferred-branch') as MilitaryBranch | null;
+    if (!data.branch && stored) {
+      updateData({ branch: stored });
+      // Keep form in sync with the remembered selection
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+    }
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+  }, []);
 
   const onSubmit = (formData: FormData) => {
     updateData({ branch: formData.branch });
@@ -58,29 +89,45 @@ export function StepBranch({ onNext, onBack }: StepBranchProps) {
             Which branch?
           </h1>
           <p className="text-xl text-gray-600">
-            Select your service branch
+            Select your service branch. We remember it on this device so you do not have to pick twice.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {branches.map((branch) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {branchCards.map((branch) => (
             <label
-              key={branch}
+              key={branch.name}
               className={`
-                relative flex items-center justify-center p-6 border-2 rounded-lg cursor-pointer transition-all
-                ${selectedBranch === branch 
-                  ? 'border-black bg-black text-white' 
-                  : 'border-gray-200 hover:border-gray-400'
+                relative flex flex-col items-center gap-3 p-6 border-2 rounded-xl cursor-pointer transition-all text-center
+                ${selectedBranch === branch.name
+                  ? 'border-black bg-black text-white shadow-lg'
+                  : 'border-gray-200 hover:border-gray-400 bg-white'
                 }
               `}
             >
               <input
                 type="radio"
-                value={branch}
+                value={branch.name}
                 {...register('branch')}
                 className="sr-only"
               />
-              <span className="text-lg font-medium">{branch}</span>
+              <div className="h-16 w-16 relative">
+                <Image
+                  src={branch.logo}
+                  alt={`${branch.name} seal`}
+                  fill
+                  sizes="64px"
+                />
+              </div>
+              <div>
+                <p className="text-lg font-semibold">{branch.name}</p>
+                <p className={`text-sm ${selectedBranch === branch.name ? 'text-gray-100' : 'text-gray-600'}`}>{branch.tagline}</p>
+              </div>
+              {selectedBranch === branch.name && (
+                <span className="absolute top-3 right-3 text-xs font-semibold px-2 py-1 rounded-full bg-white text-black">
+                  Selected
+                </span>
+              )}
             </label>
           ))}
         </div>

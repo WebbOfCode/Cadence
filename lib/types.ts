@@ -27,6 +27,7 @@ export interface OnboardingData {
   branch: MilitaryBranch;
   mos: string;
   goal: TransitionGoal;
+  lastSavedAt?: string;
   secondaryGoals?: TransitionGoal[];
   goalDetails?: {
     careerPath?: 'job-search' | 'start-business' | 'certifications' | 'not-sure';

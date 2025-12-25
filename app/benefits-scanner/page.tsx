@@ -18,12 +18,13 @@ const QuestionnaireSchema = z.object({
   county: z.string().min(2),
   educationLevel: z.enum(["high-school","some-college","bachelor","master"]),
   employmentStatus: z.enum(["unemployed","full-time","part-time","disabled"]),
-  optional: z.object({
-    combatDecorations: z.boolean().default(false),
-    purpleHeart: z.boolean().default(false),
-    dependents: z.boolean().default(false),
-    spouseVeteran: z.boolean().default(false),
-    homeowner: z.boolean().default(false),
+  personalDetails: z.object({
+    dependents: z.string().optional(),
+    spouseVeteran: z.string().optional(),
+    purpleHeart: z.string().optional(),
+    combatDecorations: z.string().optional(),
+    homeowner: z.string().optional(),
+    specificNeeds: z.string().optional(),
   }).optional(),
 });
 
@@ -66,6 +67,14 @@ export default function BenefitsScannerPage() {
       county: "Davidson",
       educationLevel: "some-college",
       employmentStatus: "unemployed",
+      personalDetails: {
+        dependents: "",
+        spouseVeteran: "",
+        purpleHeart: "",
+        combatDecorations: "",
+        homeowner: "",
+        specificNeeds: "",
+      },
     },
   });
 
@@ -388,25 +397,37 @@ export default function BenefitsScannerPage() {
                 <p className="text-sm text-gray-600">These unlock additional support and recognition-based benefits.</p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 {(
                   [
-                    { key: "dependents", label: "Any dependents?" },
-                    { key: "spouseVeteran", label: "Spouse is a veteran?" },
-                    { key: "purpleHeart", label: "Purple Heart recipient?" },
-                    { key: "combatDecorations", label: "Combat decorations?" },
-                    { key: "homeowner", label: "Own or own home?" },
+                    { key: "dependents", label: "Dependents", placeholder: "e.g., 2 children, spouse" },
+                    { key: "spouseVeteran", label: "Spouse Veteran Status", placeholder: "e.g., Army veteran 2010-2018" },
+                    { key: "purpleHeart", label: "Purple Heart Details", placeholder: "e.g., Received 2015, Afghanistan" },
+                    { key: "combatDecorations", label: "Combat Decorations", placeholder: "e.g., Bronze Star, Combat Infantry Badge" },
+                    { key: "homeowner", label: "Homeownership Status", placeholder: "e.g., Own home with mortgage" },
                   ] as const
                 ).map((opt) => (
-                  <label key={opt.key} className="flex items-center gap-3 p-3 rounded border-2 border-gray-200 hover:border-purple-300 hover:bg-purple-50 cursor-pointer transition-colors">
-                    <input 
-                      type="checkbox" 
-                      {...register((`optional.${opt.key}`) as `optional.${typeof opt.key}`)}
-                      className="w-5 h-5 text-gray-900 rounded focus:ring-2 focus:ring-purple-500"
+                  <div key={opt.key}>
+                    <label className="block text-sm font-medium text-gray-900 mb-2">{opt.label}</label>
+                    <input
+                      type="text"
+                      {...register(`personalDetails.${opt.key}` as `personalDetails.${typeof opt.key}`)}
+                      placeholder={opt.placeholder}
+                      className="w-full border-2 border-gray-300 rounded-md px-3 py-2.5 text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                     />
-                    <span className="text-sm font-medium text-gray-900">{opt.label}</span>
-                  </label>
+                  </div>
                 ))}
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">Specific Needs or Goals</label>
+                  <textarea
+                    {...register("personalDetails.specificNeeds")}
+                    placeholder="Tell us about your specific situation, challenges, or goals (e.g., 'Looking for IT training', 'Need wheelchair accessible housing', 'Interested in starting a business')"
+                    rows={3}
+                    className="w-full border-2 border-gray-300 rounded-md px-3 py-2.5 text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">This helps us find benefits and resources tailored to your unique situation.</p>
+                </div>
               </div>
             </fieldset>
 

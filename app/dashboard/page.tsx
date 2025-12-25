@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Search, Download, Settings } from 'lucide-react';
+import { Search, Download, Settings, Save, CheckCircle2, Clock, ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
 import { useOnboardingStore } from '@/lib/useOnboardingStore';
 import { formatDate, getDaysUntilETS, getGoalLabel } from '@/lib/utils';
 import type { MissionTask } from '@/lib/types';
@@ -20,6 +20,11 @@ export default function DashboardPage() {
   // Track which task's steps are expanded (by task ID)
   const [expandedStepsTaskId, setExpandedStepsTaskId] = useState<string | null>(null);
   const [isEditGoalsOpen, setIsEditGoalsOpen] = useState(false);
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    overview: true,
+    context: false,
+  });
 
   useEffect(() => {
     if (!missionPlan) {
@@ -164,13 +169,19 @@ export default function DashboardPage() {
   const tasks = missionPlan.tasks;
   const daysUntilETS = data.etsDate ? getDaysUntilETS(data.etsDate) : 0;
   const completedCount = tasks.filter((t) => t.completed).length;
-  const progressPercent = (completedCount / tasks.length) * 100;
+  const progressPercent = tasks.length ? (completedCount / tasks.length) * 100 : 0;
   
   // Calculate stats by priority
   const highPriorityTasks = tasks.filter((t) => t.priority === 'high');
   const highPriorityCompleted = highPriorityTasks.filter((t) => t.completed).length;
   const mediumPriorityTasks = tasks.filter((t) => t.priority === 'medium');
   const mediumPriorityCompleted = mediumPriorityTasks.filter((t) => t.completed).length;
+  const averageComplexity = tasks.length
+    ? Math.round(tasks.reduce((total, task) => total + getComplexityScore(task), 0) / tasks.length)
+    : 0;
+  const averageTimePressure = tasks.length
+    ? Math.round(tasks.reduce((total, task) => total + getTimelineMeta(task).score, 0) / tasks.length)
+    : 0;
 
   const toggleTask = (taskId: string) => {
     const task = tasks.find((t) => t.id === taskId);
@@ -338,20 +349,113 @@ export default function DashboardPage() {
     return labels[category] || category;
   };
 
+  const daysBetween = (futureDate: Date, startDate: Date) => {
+    return Math.ceil((futureDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
+  const getComplexityScore = (task: MissionTask) => {
+    const stepWeight = (task.steps?.length || 1) * 12;
+    const priorityWeight = task.priority === 'high' ? 40 : task.priority === 'medium' ? 25 : 10;
+    const coreWeight = task.core ? 8 : 0;
+    return Math.min(100, stepWeight + priorityWeight + coreWeight);
+  };
+
+  const getComplexityLabel = (score: number) => {
+    if (score >= 75) return 'Heavy lift';
+    if (score >= 45) return 'Moderate effort';
+    return 'Quick win';
+  };
+
+  const getBarTone = (score: number) => {
+    if (score >= 75) return 'bg-red-500';
+    if (score >= 45) return 'bg-amber-500';
+    return 'bg-emerald-500';
+  };
+
+  const getTimelineMeta = (task: MissionTask) => {
+    if (task.deadline) {
+      const daysLeft = daysBetween(new Date(task.deadline), new Date());
+      const horizon = Math.max(14, Math.min(120, daysLeft + 30));
+      const score = Math.max(0, Math.min(100, 100 - (daysLeft / horizon) * 100));
+      const label = daysLeft <= 0 ? 'Overdue' : `${daysLeft} days left`;
+      return { score, label };
+    }
+
+    const fallbackScore = task.priority === 'high' ? 70 : task.priority === 'medium' ? 45 : 30;
+    return { score: fallbackScore, label: 'No deadline set' };
+  };
+
+  const formatRelativeTime = (date: Date) => {
+    const diffMs = Date.now() - date.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    if (diffMinutes < 1) return 'just now';
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+  };
+
+  const toggleSection = (key: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const handleSaveProgress = () => {
+    if (saveState === 'saving') return;
+    setSaveState('saving');
+    setTimeout(() => {
+      updateData({ lastSavedAt: new Date().toISOString() });
+      setSaveState('saved');
+      setTimeout(() => setSaveState('idle'), 1800);
+    }, 450);
+  };
+
+  const lastSavedAt = data.lastSavedAt ? new Date(data.lastSavedAt) : null;
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
         {/* Header */}
-        <div className="mb-12 flex items-start justify-between">
-          <div>
-            <h1 className="text-6xl font-bold tracking-tight mb-3">
-              Mission: Transition
-            </h1>
-            <p className="text-2xl text-gray-600">
-              Welcome back, {data.name}
-            </p>
+        <div className="mb-10 md:mb-12 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+          <div className="space-y-3 max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 text-xs font-semibold uppercase tracking-wide text-gray-700">Mission Control</div>
+            <div>
+              <h1 className="text-5xl md:text-6xl font-bold tracking-tight leading-[1.05]">Mission: Transition</h1>
+              <p className="text-xl md:text-2xl text-gray-600 mt-2">Welcome back, {data.name}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
+                <Clock size={16} />
+                <span>ETS in {daysUntilETS} days</span>
+              </div>
+              {lastSavedAt && (
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg">
+                  <CheckCircle2 size={16} />
+                  <span>Saved {formatRelativeTime(lastSavedAt)}</span>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="flex gap-3">
+
+          <div className="flex flex-wrap gap-3 justify-end">
+            <button
+              onClick={handleSaveProgress}
+              className={`flex items-center gap-2 px-4 py-3 rounded-lg border-2 font-medium transition-colors ${
+                saveState === 'saved'
+                  ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
+                  : saveState === 'saving'
+                    ? 'border-gray-300 bg-gray-50 text-gray-700'
+                    : 'border-black bg-black text-white hover:bg-gray-900'
+              }`}
+            >
+              {saveState === 'saving' && <Loader2 size={18} className="animate-spin" />}
+              {saveState === 'saved' && <CheckCircle2 size={18} />}
+              {saveState === 'idle' && <Save size={18} />}
+              {saveState === 'saving' ? 'Saving...' : saveState === 'saved' ? 'Saved' : 'Save Progress'}
+            </button>
             <button
               onClick={() => setIsEditGoalsOpen(true)}
               className="flex items-center gap-2 px-4 py-3 border-2 border-gray-200 rounded-lg hover:border-black transition-colors font-medium"
@@ -368,6 +472,20 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
+
+        {saveState === 'saved' && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 inline-flex items-center gap-3 px-4 py-3 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800"
+          >
+            <CheckCircle2 size={18} />
+            <div>
+              <p className="text-sm font-semibold">Progress saved</p>
+              <p className="text-xs">Updated {formatRelativeTime(lastSavedAt || new Date())}</p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Discharge Upgrade Banner (Behavioral UX) */}
         {data.dischargeType && data.dischargeType !== 'honorable' && !data.dischargeUpgradeBannerDismissed && (
@@ -559,7 +677,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-8 md:mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8 md:mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -605,6 +723,39 @@ export default function DashboardPage() {
             <p className="text-2xl font-bold">{data.goal && getGoalLabel(data.goal)}</p>
             <p className="text-sm text-gray-600 mt-2">{data.branch} • {data.mos}</p>
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="p-6 border-2 border-gray-200 rounded-lg"
+          >
+            <p className="text-sm font-medium uppercase tracking-wide text-gray-500 mb-4">
+              Effort & Time
+            </p>
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                  <span>Average Complexity</span>
+                  <span className="font-semibold text-gray-900">{averageComplexity}%</span>
+                </div>
+                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`h-full ${getBarTone(averageComplexity)} rounded-full`} style={{ width: `${averageComplexity}%` }} />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">{getComplexityLabel(averageComplexity)}</p>
+              </div>
+              <div>
+                <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                  <span>Time Pressure</span>
+                  <span className="font-semibold text-gray-900">{averageTimePressure}%</span>
+                </div>
+                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`h-full ${getBarTone(averageTimePressure)} rounded-full`} style={{ width: `${averageTimePressure}%` }} />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Blends deadlines + priority urgency</p>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
         {/* Overview */}
@@ -612,10 +763,93 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mb-12 p-8 bg-gray-50 rounded-lg"
+          className="mb-10 p-8 bg-gray-50 rounded-xl border border-gray-200"
         >
-          <h2 className="text-2xl font-bold mb-4">Your Transition Plan</h2>
-          <p className="text-lg text-gray-700 leading-relaxed">{missionPlan.overview}</p>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">Mission Brief</p>
+              <h2 className="text-2xl md:text-3xl font-bold mt-1">Your Transition Plan</h2>
+              <p className="text-sm text-gray-600 mt-1">High-level summary with expandable details below.</p>
+            </div>
+            <button
+              onClick={() => toggleSection('overview')}
+              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-black transition-colors"
+            >
+              {expandedSections.overview ? 'Hide details' : 'View details'}
+              {expandedSections.overview ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            </button>
+          </div>
+
+          {expandedSections.overview && (
+            <div className="mt-6 space-y-6">
+              <p className="text-lg text-gray-700 leading-relaxed">{missionPlan.overview}</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-white rounded-lg border border-gray-200">
+                  <p className="text-xs uppercase font-semibold text-gray-500 mb-1">Primary Goal</p>
+                  <p className="text-lg font-semibold text-gray-900">{data.goal && getGoalLabel(data.goal)}</p>
+                  {data.secondaryGoals && data.secondaryGoals.length > 0 && (
+                    <p className="text-sm text-gray-600 mt-1">Supporting: {data.secondaryGoals.map(getGoalLabel).join(', ')}</p>
+                  )}
+                </div>
+                <div className="p-4 bg-white rounded-lg border border-gray-200">
+                  <p className="text-xs uppercase font-semibold text-gray-500 mb-1">Location & Branch</p>
+                  <p className="text-lg font-semibold text-gray-900">{data.location || 'Not set'}</p>
+                  <p className="text-sm text-gray-600 mt-1">{data.branch} • {data.mos}</p>
+                </div>
+                <div className="p-4 bg-white rounded-lg border border-gray-200">
+                  <p className="text-xs uppercase font-semibold text-gray-500 mb-1">Timeline</p>
+                  <p className="text-lg font-semibold text-gray-900">{daysUntilETS} days to ETS</p>
+                  <p className="text-sm text-gray-600 mt-1">Generated {formatDate(missionPlan.generatedAt)}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.42 }}
+          className="mb-12 p-6 border-2 border-gray-200 rounded-xl"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">Service Context</p>
+              <h3 className="text-xl font-bold">More details</h3>
+            </div>
+            <button
+              onClick={() => toggleSection('context')}
+              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-black transition-colors"
+            >
+              {expandedSections.context ? 'Collapse' : 'Expand'}
+              {expandedSections.context ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            </button>
+          </div>
+          {expandedSections.context && (
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-700">
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="font-semibold text-gray-900">Discharge Type</p>
+                <p className="text-gray-600 mt-1">{data.dischargeType ? data.dischargeType : 'Not provided'}</p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="font-semibold text-gray-900">Time in Service</p>
+                <p className="text-gray-600 mt-1">{data.timeInService ? `${data.timeInService} years` : 'Not provided'}</p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="font-semibold text-gray-900">Discharge Rank</p>
+                <p className="text-gray-600 mt-1">{data.dischargeRank || 'Not provided'}</p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="font-semibold text-gray-900">Benefits markers</p>
+                <p className="text-gray-600 mt-1">Disability claim: {data.disabilityClaim === false ? 'Not filed' : 'Filed/unknown'}</p>
+                <p className="text-gray-600">GI Bill: {data.giBill === false ? 'Not activated' : 'Active/unknown'}</p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="font-semibold text-gray-900">Awards noted</p>
+                <p className="text-gray-600 mt-1">{data.awards && data.awards.length > 0 ? data.awards.join(', ') : 'None captured yet'}</p>
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* Quick Access Tools */}
@@ -801,6 +1035,45 @@ export default function DashboardPage() {
                   </div>
 
                   <p className="text-gray-600 mb-3">{task.description}</p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                    {(() => {
+                      const complexityScore = getComplexityScore(task);
+                      const timeline = getTimelineMeta(task);
+                      return (
+                        <>
+                          <div>
+                            <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                              <span>Complexity</span>
+                              <span className="font-semibold text-gray-900">{complexityScore}%</span>
+                            </div>
+                            <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full ${getBarTone(complexityScore)} rounded-full`}
+                                style={{ width: `${complexityScore}%` }}
+                              />
+                            </div>
+                            <p className="text-[11px] text-gray-500 mt-1">{getComplexityLabel(complexityScore)}</p>
+                          </div>
+                          <div>
+                            <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                              <span className="flex items-center gap-1">
+                                <Clock size={12} /> Time
+                              </span>
+                              <span className="font-semibold text-gray-900">{timeline.score}%</span>
+                            </div>
+                            <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full ${getBarTone(timeline.score)} rounded-full`}
+                                style={{ width: `${timeline.score}%` }}
+                              />
+                            </div>
+                            <p className="text-[11px] text-gray-500 mt-1">{timeline.label}</p>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
 
                   {/* Step Progress Indicator */}
                   {task.steps && task.steps.length > 0 && (
