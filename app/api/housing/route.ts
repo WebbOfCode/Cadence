@@ -10,7 +10,7 @@ export interface HousingQuery {
   voucher?: boolean;
 }
 
-export function filterListings(q: HousingQuery) {
+function filterListings(q: HousingQuery) {
   const normalize = (s: string) => s.trim().toLowerCase();
   const loc = q.location ? normalize(q.location) : undefined;
 

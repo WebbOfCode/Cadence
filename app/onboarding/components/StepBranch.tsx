@@ -46,35 +46,26 @@ export function StepBranch({ onNext, onBack }: StepBranchProps) {
     },
   });
 
-      useEffect(() => {
-        if (typeof window === 'undefined') return;
-        const stored = localStorage.getItem('cadence-preferred-branch') as MilitaryBranch | null;
-        if (!data.branch && stored) {
-          setValue('branch', stored, { shouldValidate: true });
-          updateData({ branch: stored });
-        }
-      }, [data.branch, setValue, updateData]);
-
-      useEffect(() => {
-        if (!selectedBranch) return;
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('cadence-preferred-branch', selectedBranch);
-        }
-        updateData({ branch: selectedBranch });
-      }, [selectedBranch, updateData]);
-
   const selectedBranch = watch('branch');
 
+  // Hydrate from remembered selection on first load
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const stored = localStorage.getItem('cadence-preferred-branch') as MilitaryBranch | null;
     if (!data.branch && stored) {
+      setValue('branch', stored, { shouldValidate: true });
       updateData({ branch: stored });
-      // Keep form in sync with the remembered selection
-      // eslint-disable-next-line react-hooks/rules-of-hooks
     }
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-  }, []);
+  }, [data.branch, setValue, updateData]);
+
+  // Persist new selections
+  useEffect(() => {
+    if (!selectedBranch) return;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cadence-preferred-branch', selectedBranch);
+    }
+    updateData({ branch: selectedBranch });
+  }, [selectedBranch, updateData]);
 
   const onSubmit = (formData: FormData) => {
     updateData({ branch: formData.branch });
