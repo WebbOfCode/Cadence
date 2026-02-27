@@ -267,7 +267,7 @@ export default function DashboardPage() {
     }, 450);
   };
 
-  const tasks = missionPlan.tasks;
+  const tasks = missionPlan?.tasks ?? [];
   const daysUntilETS = data.etsDate ? getDaysUntilETS(data.etsDate) : 0;
   const completedCount = tasks.filter((t) => t.completed).length;
   const progressPercent = tasks.length ? (completedCount / tasks.length) * 100 : 0;
