@@ -29,8 +29,8 @@ export default function BranchSwitcher({ compact = false }: { compact?: boolean 
   }, [current, updateData]);
 
   return (
-    <div className="flex items-center gap-2">
-      <label className="text-xs font-medium opacity-80" htmlFor="branch-switcher">
+    <div className="branch-switcher flex items-center gap-2">
+      <label className="branch-switcher-label text-xs font-medium opacity-80" htmlFor="branch-switcher">
         {label}
       </label>
       <select
@@ -43,7 +43,7 @@ export default function BranchSwitcher({ compact = false }: { compact?: boolean 
             localStorage.setItem("cadence-preferred-branch", nextBranch);
           }
         }}
-        className="text-sm border-2 rounded-none px-2 py-1 bg-white text-black border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-gray-300"
+        className="branch-switcher-select text-sm border-2 rounded-none px-2 py-1 bg-white text-black border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-gray-300"
       >
         <option value="" disabled>
           Select

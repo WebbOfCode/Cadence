@@ -122,7 +122,7 @@ export default function BenefitsScannerPage() {
           links: [
             { label: 'DD Form 293', url: 'https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0293.pdf' },
             { label: 'DD Form 149', url: 'https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0149.pdf' },
-            { label: 'DAV Office', url: 'https://www.dav.org/find-your-local-dav-office/' },
+            { label: 'DAV Office', url: 'https://www.dav.org/find-your-local-office/' },
           ],
         });
       }
@@ -290,7 +290,7 @@ export default function BenefitsScannerPage() {
                     <div className="mt-3 flex flex-wrap gap-2">
                       <a className="text-xs px-3 py-2 border-2 border-gray-300 rounded hover:border-gray-400" href="https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0293.pdf" target="_blank" rel="noreferrer">DD Form 293</a>
                       <a className="text-xs px-3 py-2 border-2 border-gray-300 rounded hover:border-gray-400" href="https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0149.pdf" target="_blank" rel="noreferrer">DD Form 149</a>
-                      <a className="text-xs px-3 py-2 border-2 border-gray-300 rounded hover:border-gray-400" href="https://www.dav.org/find-your-local-dav-office/" target="_blank" rel="noreferrer">DAV</a>
+                      <a className="text-xs px-3 py-2 border-2 border-gray-300 rounded hover:border-gray-400" href="https://www.dav.org/find-your-local-office/" target="_blank" rel="noreferrer">DAV</a>
                       <a className="text-xs px-3 py-2 border-2 border-gray-300 rounded hover:border-gray-400" href="https://www.legion.org/" target="_blank" rel="noreferrer">American Legion</a>
                       <a className="text-xs px-3 py-2 border-2 border-gray-300 rounded hover:border-gray-400" href="https://www.vfw.org/" target="_blank" rel="noreferrer">VFW</a>
                     </div>

@@ -64,6 +64,8 @@ export async function POST(req: Request) {
     accessible: body.accessible,
     voucher: body.voucher,
   };
+  console.log('Housing search query:', q);
   const results = filterListings(q);
+  console.log(`Found ${results.length} listings matching criteria`);
   return NextResponse.json({ results });
 }

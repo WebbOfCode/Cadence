@@ -302,6 +302,11 @@ export default function DashboardPage() {
   };
 
   const exportMissionPlan = async () => {
+    if (!missionPlan) {
+      alert('Mission plan not loaded. Please refresh and try again.');
+      return;
+    }
+
     try {
       const { jsPDF } = await import('jspdf');
       const doc = new jsPDF();
@@ -515,7 +520,7 @@ export default function DashboardPage() {
                 <div className="flex flex-wrap gap-2 mt-3">
                   <a href="https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0293.pdf" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">DD Form 293</a>
                   <a href="https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0149.pdf" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">DD Form 149</a>
-                  <a href="https://www.dav.org/find-your-local-dav-office/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">Find DAV Office</a>
+                  <a href="https://www.dav.org/find-your-local-office/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">Find DAV Office</a>
                 </div>
                 <p className="text-xs text-gray-400 mt-3">Cadence provides guidance, not legal advice. No guarantees of approval.</p>
               </div>

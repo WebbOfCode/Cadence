@@ -58,7 +58,7 @@ export async function GET(req: Request) {
     {
       name: 'DAV – Disabled American Veterans (Find Local Office)',
       type: 'VSO',
-      url: 'https://www.dav.org/find-your-local-dav-office/',
+      url: 'https://www.dav.org/find-your-local-office/',
       description: 'Accredited veterans service officers help file and manage VA claims.'
     },
     {

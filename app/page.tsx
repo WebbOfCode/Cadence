@@ -148,7 +148,7 @@ export default function HomePage() {
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               className="md:col-span-7 md:row-span-2 card-nike bg-gray-100 reveal"
             >
-              <div className="aspect-[4/3] relative w-full h-full">
+              <div className="aspect-[4/3] relative w-full h-full bg-cover bg-center" style={{ backgroundImage: 'url(/1.png)' }}>
                 <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-10"></div>
                 <div className="absolute bottom-0 left-0 p-8 z-20 text-white">
                   <p className="label-text text-white/70 mb-3">01</p>
@@ -165,7 +165,7 @@ export default function HomePage() {
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
               className="md:col-span-5 card-nike bg-gray-100 reveal"
             >
-              <div className="aspect-square relative w-full">
+              <div className="aspect-square relative w-full bg-cover bg-center" style={{ backgroundImage: 'url(/2.png)' }}>
                 <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-10"></div>
                 <div className="absolute bottom-0 left-0 p-6 z-20 text-white">
                   <p className="label-text text-white/70 mb-2">02</p>
@@ -182,7 +182,7 @@ export default function HomePage() {
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
               className="md:col-span-5 card-nike bg-gray-100 reveal"
             >
-              <div className="aspect-square relative w-full">
+              <div className="aspect-square relative w-full bg-cover bg-center" style={{ backgroundImage: 'url(/3.png)' }}>
                 <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-black/40 z-10"></div>
                 <div className="absolute bottom-0 left-0 p-6 z-20 text-white">
                   <p className="label-text text-white/70 mb-2">03</p>

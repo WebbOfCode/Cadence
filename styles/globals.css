@@ -450,6 +450,18 @@
   @apply text-white bg-white/10 border-white/60;
 }
 
+.site-header.dark-mode .branch-switcher-label {
+  @apply text-white;
+}
+
+.site-header.dark-mode .branch-switcher-select {
+  @apply bg-transparent text-white border-white/40;
+}
+
+.site-header.dark-mode .btn-nike-primary {
+  @apply text-white;
+}
+
 /* Solid white on scroll with blur */
 .site-header.scrolled {
   background: rgba(255, 255, 255, 0.98);
@@ -468,6 +480,18 @@
 
 .site-header.scrolled .nav-link:hover {
   @apply text-black bg-black/5 border-black/40;
+}
+
+.site-header.scrolled .branch-switcher-label {
+  @apply text-black;
+}
+
+.site-header.scrolled .branch-switcher-select {
+  @apply bg-white text-black border-gray-300;
+}
+
+.site-header.scrolled .btn-nike-primary {
+  @apply text-white;
 }
 
 /* Navigation links - Nike style */

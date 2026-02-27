@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,6 +56,7 @@ export default function HousingFinderPage() {
     handleSubmit,
     formState: { errors },
     watch,
+    getValues,
   } = useForm<HousingForm>({
     resolver: zodResolver(HousingSchema),
     defaultValues: {
@@ -79,13 +80,40 @@ export default function HousingFinderPage() {
       });
       if (!resp.ok) throw new Error("Failed to search housing");
       const json = await resp.json();
-      setResults(json.results);
+      setResults(json.results || []);
+      if (json.results?.length === 0) {
+        setError("No listings found matching your criteria. Try adjusting your filters.");
+      }
     } catch (e: any) {
       setError(e.message ?? "Unknown error");
     } finally {
       setLoading(false);
     }
   };
+
+  // Auto-load default search on mount
+  useEffect(() => {
+    const searchDefault = async () => {
+      setLoading(true);
+      try {
+        const resp = await fetch("/api/housing", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ location: "Nashville, TN" }),
+        });
+        if (resp.ok) {
+          const json = await resp.json();
+          setResults(json.results || []);
+        }
+      } catch (e) {
+        console.error("Failed to load default housing search", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    searchDefault();
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12">
