@@ -33,6 +33,12 @@ export default function DashboardPage() {
     }
   }, [missionPlan, router]);
 
+  const hasValidMissionPlan = Boolean(
+    missionPlan &&
+    Array.isArray(missionPlan.tasks) &&
+    missionPlan.tasks.length > 0
+  );
+
   // Inject NCO Guidance tasks (behavioral nudges) based on key triggers
   useEffect(() => {
     if (!missionPlan) return;
@@ -162,8 +168,25 @@ export default function DashboardPage() {
     }
   }, [missionPlan, data.dischargeType, data.etsDate, data.disabilityClaim, data.giBill, data.goal, addTask, updateData]);
 
-  if (!missionPlan || !data.name) {
-    return null;
+  if (!hasValidMissionPlan || !data.name) {
+    return (
+      <div className="min-h-screen dashboard-bg px-6 py-12 flex items-center justify-center">
+        <div className="w-full max-w-2xl rounded-2xl border border-white/15 bg-black/80 text-white p-8">
+          <p className="text-xs uppercase tracking-[0.2em] text-gray-400 mb-3">Mission Gate</p>
+          <h1 className="text-2xl font-black uppercase tracking-tight mb-3">Complete Onboarding Before Results</h1>
+          <p className="text-gray-200 mb-6">
+            Your results screen is available after onboarding is complete. Finish onboarding so Cadence can generate your mission plan and load your dashboard.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push('/onboarding')}
+            className="px-5 py-3 rounded-full bg-white text-black font-bold uppercase text-sm"
+          >
+            Continue to Onboarding
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // Define helper functions before they're used in calculations

@@ -101,7 +101,7 @@ export default function BugReportModal({ isOpen, onClose }: { isOpen: boolean; o
         body: JSON.stringify({
           description: formData.description,
           pageUrl: formData.pageUrl,
-          email: formData.email || 'anonymous@cadence.app',
+          email: formData.email || 'help@demarickwebb.dev',
           timestamp: new Date().toISOString(),
           userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : ''
         })

@@ -22,7 +22,7 @@ Description:
 ${description}
 
 Page URL: ${pageUrl}
-User Email: ${email || 'anonymous@cadence.app'}
+User Email: ${email || 'help@demarickwebb.dev'}
 Submitted: ${timestamp}
 User Agent: ${userAgent}
     `.trim();
@@ -47,7 +47,7 @@ User Agent: ${userAgent}
     //     template_id: process.env.EMAILJS_TEMPLATE_ID,
     //     user_id: process.env.EMAILJS_PUBLIC_KEY,
     //     template_params: {
-    //       to_email: 'admin@cadence.com',
+    //       to_email: 'help@demarickwebb.dev',
     //       from_email: email,
     //       message: emailContent,
     //       subject: `Bug Report - ${pageUrl}`

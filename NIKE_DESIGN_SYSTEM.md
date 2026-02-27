@@ -149,7 +149,7 @@ import { NikeButton, NikeHeadline, NikeCard, NikeSection } from '@/components/Ni
 
 ## 🔌 EmailJS Setup (Optional Enhancement)
 
-To send emails to admin@cadence.com:
+To send emails to help@demarickwebb.dev:
 
 ```javascript
 // Install: npm install @emailjs/browser
