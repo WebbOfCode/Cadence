@@ -83,7 +83,7 @@ export function StepDischargeType({ onNext, onBack }: StepDischargeTypeProps) {
         </div>
 
         {/* Info Banner */}
-        <div className="flex gap-3 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+        <div className="flex gap-3 p-4 bg-blue-50 border-2 border-blue-200 rounded-none">
           <Info size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-blue-700">
             Your discharge type affects VA benefits eligibility and available support resources. We'll provide tailored guidance based on your status.
@@ -98,7 +98,7 @@ export function StepDischargeType({ onNext, onBack }: StepDischargeTypeProps) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className={`
-                flex items-start gap-4 p-4 border-2 rounded-lg cursor-pointer transition-all
+                flex items-start gap-4 p-4 border-2 rounded-none cursor-pointer transition-all
                 ${selectedType === value 
                   ? `${info.color} border-current` 
                   : 'border-gray-200 bg-white hover:border-gray-300'
@@ -134,7 +134,7 @@ export function StepDischargeType({ onNext, onBack }: StepDischargeTypeProps) {
               type="text"
               placeholder="e.g., RE-3, JKA, etc."
               {...register('dischargeCode')}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-none focus:outline-none focus:border-black transition-colors"
             />
             <p className="text-xs text-gray-600">
               If you have a specific discharge code (RE code, separation code, etc.), enter it here. This helps us provide more targeted benefit guidance.
@@ -143,7 +143,7 @@ export function StepDischargeType({ onNext, onBack }: StepDischargeTypeProps) {
         )}
 
         {errors.dischargeType && (
-          <div className="p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+          <div className="p-4 bg-red-50 border-2 border-red-200 rounded-none">
             <p className="text-sm text-red-600">{errors.dischargeType.message}</p>
           </div>
         )}

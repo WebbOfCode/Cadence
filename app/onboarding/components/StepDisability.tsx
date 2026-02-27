@@ -60,7 +60,7 @@ export function StepDisability({ onNext, onBack }: StepDisabilityProps) {
             type="button"
             onClick={() => handleSelection(true)}
             className={`
-              w-full flex items-center justify-center p-6 border-2 rounded-lg cursor-pointer transition-all
+              w-full flex items-center justify-center p-6 border-2 rounded-none cursor-pointer transition-all
               ${selectedValue === true 
                 ? 'border-black bg-black text-white' 
                 : 'border-gray-200 hover:border-gray-400'
@@ -74,7 +74,7 @@ export function StepDisability({ onNext, onBack }: StepDisabilityProps) {
             type="button"
             onClick={() => handleSelection(false)}
             className={`
-              w-full flex items-center justify-center p-6 border-2 rounded-lg cursor-pointer transition-all
+              w-full flex items-center justify-center p-6 border-2 rounded-none cursor-pointer transition-all
               ${selectedValue === false 
                 ? 'border-black bg-black text-white' 
                 : 'border-gray-200 hover:border-gray-400'
@@ -89,13 +89,13 @@ export function StepDisability({ onNext, onBack }: StepDisabilityProps) {
           <button
             type="button"
             onClick={onBack}
-            className="flex-1 py-4 border-2 border-black text-black font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex-1 py-4 border-2 border-black text-black font-medium rounded-none hover:bg-gray-50 transition-colors"
           >
             Back
           </button>
           <button
             type="submit"
-            className="flex-1 py-4 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="flex-1 py-4 bg-black text-white font-medium rounded-none hover:bg-gray-800 transition-colors"
           >
             Continue
           </button>

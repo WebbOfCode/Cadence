@@ -43,7 +43,7 @@ export default function BranchSwitcher({ compact = false }: { compact?: boolean 
             localStorage.setItem("cadence-preferred-branch", nextBranch);
           }
         }}
-        className="text-sm border-2 rounded-md px-2 py-1 bg-white text-black border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-gray-300"
+        className="text-sm border-2 rounded-none px-2 py-1 bg-white text-black border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-gray-300"
       >
         <option value="" disabled>
           Select

@@ -73,7 +73,7 @@ export function StepTimeInService({ onNext, onBack }: StepTimeInServiceProps) {
             <label
               key={option.value}
               className={`
-                relative flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all
+                relative flex items-center justify-center p-4 border-2 rounded-none cursor-pointer transition-all
                 ${selectedTime === option.value
                   ? 'border-black bg-black text-white'
                   : 'border-gray-200 hover:border-gray-400'

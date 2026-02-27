@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import '../styles/globals.css';
 import { Header } from '@/components/Header';
 import ThemeProvider from '@/components/ThemeProvider';
+import BugReportButton from '@/components/BugReportButton';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -56,6 +57,7 @@ export default function RootLayout({
         <ThemeProvider>
           <Header />
           {children}
+          <BugReportButton />
         </ThemeProvider>
       </body>
     </html>

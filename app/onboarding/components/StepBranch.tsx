@@ -89,7 +89,7 @@ export function StepBranch({ onNext, onBack }: StepBranchProps) {
             <label
               key={branch.name}
               className={`
-                relative flex flex-col items-center gap-3 p-6 border-2 rounded-xl cursor-pointer transition-all text-center
+                relative flex flex-col items-center gap-3 p-6 border-2 rounded-none cursor-pointer transition-all text-center
                 ${selectedBranch === branch.name
                   ? 'border-black bg-black text-white shadow-lg'
                   : 'border-gray-200 hover:border-gray-400 bg-white'
@@ -115,7 +115,7 @@ export function StepBranch({ onNext, onBack }: StepBranchProps) {
                 <p className={`text-sm ${selectedBranch === branch.name ? 'text-gray-100' : 'text-gray-600'}`}>{branch.tagline}</p>
               </div>
               {selectedBranch === branch.name && (
-                <span className="absolute top-3 right-3 text-xs font-semibold px-2 py-1 rounded-full bg-white text-black">
+                <span className="absolute top-3 right-3 text-xs font-semibold px-2 py-1 rounded-none bg-white text-black">
                   Selected
                 </span>
               )}
@@ -127,14 +127,14 @@ export function StepBranch({ onNext, onBack }: StepBranchProps) {
           <button
             type="button"
             onClick={onBack}
-            className="flex-1 py-4 border-2 border-black text-black font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex-1 py-4 border-2 border-black text-black font-medium rounded-none hover:bg-gray-50 transition-colors"
           >
             Back
           </button>
           <button
             type="submit"
             disabled={!isValid}
-            className="flex-1 py-4 bg-black text-white font-medium rounded-lg hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
+            className="flex-1 py-4 bg-black text-white font-medium rounded-none hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
           >
             Continue
           </button>

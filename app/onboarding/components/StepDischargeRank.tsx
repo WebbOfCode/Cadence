@@ -57,7 +57,7 @@ export function StepDischargeRank({ onNext, onBack }: StepDischargeRankProps) {
           </p>
           <button
             onClick={onBack}
-            className="py-4 px-6 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="py-4 px-6 bg-black text-white font-medium rounded-none hover:bg-gray-800 transition-colors"
           >
             Go Back
           </button>
@@ -82,7 +82,7 @@ export function StepDischargeRank({ onNext, onBack }: StepDischargeRankProps) {
           <div className="relative">
             <select
               {...register('dischargeRank')}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors appearance-none bg-white cursor-pointer text-base"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-none focus:outline-none focus:border-black transition-colors appearance-none bg-white cursor-pointer text-base"
             >
               <option value="">Select your rank...</option>
               {availableRanks.map((rank) => (
@@ -109,7 +109,7 @@ export function StepDischargeRank({ onNext, onBack }: StepDischargeRankProps) {
           </div>
 
           {selectedRank && (
-            <div className="p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+            <div className="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-none">
               <p className="text-sm text-gray-700">
                 <span className="font-semibold">Selected rank:</span> {selectedRank}
               </p>
@@ -121,14 +121,14 @@ export function StepDischargeRank({ onNext, onBack }: StepDischargeRankProps) {
           <button
             type="button"
             onClick={onBack}
-            className="flex-1 py-4 border-2 border-black text-black font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex-1 py-4 border-2 border-black text-black font-medium rounded-none hover:bg-gray-50 transition-colors"
           >
             Back
           </button>
           <button
             type="submit"
             disabled={!isValid}
-            className="flex-1 py-4 bg-black text-white font-medium rounded-lg hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
+            className="flex-1 py-4 bg-black text-white font-medium rounded-none hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
           >
             Continue
           </button>

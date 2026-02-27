@@ -71,7 +71,7 @@ export function StepAwards({ onNext, onBack }: StepAwardsProps) {
         </div>
 
         {/* Info Banner */}
-        <div className="flex gap-3 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+        <div className="flex gap-3 p-4 bg-blue-50 border-2 border-blue-200 rounded-none">
           <Info size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-blue-700">
             Awards and decorations demonstrate your service excellence and can strengthen your civilian resume. This section is optional—you can skip it if you don't remember all your awards.
@@ -89,7 +89,7 @@ export function StepAwards({ onNext, onBack }: StepAwardsProps) {
               control={control}
               render={({ field }) => (
                 <>
-                  <label className="flex items-center gap-3 cursor-pointer p-3 border-2 border-gray-200 rounded-lg hover:border-gray-300 transition-colors" style={{ borderColor: field.value === true ? '#000' : '#e5e7eb' }}>
+                  <label className="flex items-center gap-3 cursor-pointer p-3 border-2 border-gray-200 rounded-none hover:border-gray-300 transition-colors" style={{ borderColor: field.value === true ? '#000' : '#e5e7eb' }}>
                     <input
                       type="radio"
                       {...field}
@@ -100,7 +100,7 @@ export function StepAwards({ onNext, onBack }: StepAwardsProps) {
                     />
                     <span className="font-medium">Yes</span>
                   </label>
-                  <label className="flex items-center gap-3 cursor-pointer p-3 border-2 border-gray-200 rounded-lg hover:border-gray-300 transition-colors" style={{ borderColor: field.value === false ? '#000' : '#e5e7eb' }}>
+                  <label className="flex items-center gap-3 cursor-pointer p-3 border-2 border-gray-200 rounded-none hover:border-gray-300 transition-colors" style={{ borderColor: field.value === false ? '#000' : '#e5e7eb' }}>
                     <input
                       type="radio"
                       {...field}
@@ -136,7 +136,7 @@ export function StepAwards({ onNext, onBack }: StepAwardsProps) {
                     {COMMON_AWARDS.map((award) => (
                       <label
                         key={award}
-                        className="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-lg hover:border-gray-300 cursor-pointer transition-colors"
+                        className="flex items-center gap-3 p-3 border-2 border-gray-200 rounded-none hover:border-gray-300 cursor-pointer transition-colors"
                       >
                         <input
                           type="checkbox"
@@ -161,7 +161,7 @@ export function StepAwards({ onNext, onBack }: StepAwardsProps) {
             </div>
 
             {/* Other Awards Text Input */}
-            <div className="space-y-3 mt-6 p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
+            <div className="space-y-3 mt-6 p-4 bg-gray-50 rounded-none border-2 border-gray-200">
               <label className="text-lg font-semibold text-gray-800">
                 Other awards or decorations (optional):
               </label>
@@ -175,7 +175,7 @@ export function StepAwards({ onNext, onBack }: StepAwardsProps) {
                   <textarea
                     {...field}
                     placeholder="e.g., Joint Service Achievement Medal, Foreign Military Decoration, Meritorious Unit Commendation"
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors resize-none"
+                    className="w-full p-3 border-2 border-gray-200 rounded-none focus:outline-none focus:border-black transition-colors resize-none"
                     rows={3}
                   />
                 )}
@@ -189,13 +189,13 @@ export function StepAwards({ onNext, onBack }: StepAwardsProps) {
           <button
             type="button"
             onClick={onBack}
-            className="flex-1 py-4 border-2 border-black text-black font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex-1 py-4 border-2 border-black text-black font-medium rounded-none hover:bg-gray-50 transition-colors"
           >
             Back
           </button>
           <button
             type="submit"
-            className="flex-1 py-4 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="flex-1 py-4 bg-black text-white font-medium rounded-none hover:bg-gray-800 transition-colors"
           >
             Next
           </button>

@@ -1,18 +1,55 @@
+/* --- TYPOGRAPHY SYSTEM --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============================================
+   NIKE-INSPIRED DESIGN SYSTEM - CADENCE
+   Bold. Aggressive. Minimal. Powerful.
+   ============================================ */
 
 @layer base {
   * {
     @apply border-border;
   }
   
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
   body {
-    @apply bg-white text-black font-sans antialiased;
+    @apply bg-white text-black font-sans antialiased overflow-x-hidden;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
+  /* NIKE-STYLE AGGRESSIVE HEADLINES */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight;
+    @apply font-black tracking-tighter uppercase leading-none;
+    letter-spacing: -0.04em;
+  }
+
+  h1 {
+    @apply text-6xl md:text-8xl lg:text-9xl;
+    font-weight: 900;
+  }
+
+  h2 {
+    @apply text-4xl md:text-6xl lg:text-7xl;
+    font-weight: 900;
+  }
+
+  h3 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+    font-weight: 800;
+  }
+
+  /* Body text - clean, readable, but bold */
+  p {
+    @apply text-base md:text-lg leading-relaxed font-medium;
   }
 }
 
@@ -20,101 +57,925 @@
   .text-balance {
     text-wrap: balance;
   }
+  
+  /* Nike-style text treatments */
+  .text-stroke {
+    -webkit-text-stroke: 2px currentColor;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .text-stroke-white {
+    -webkit-text-stroke: 2px white;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .text-stroke-black {
+    -webkit-text-stroke: 2px black;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* Aggressive uppercase with tight tracking */
+  .text-aggressive {
+    @apply uppercase tracking-tighter font-black;
+    letter-spacing: -0.02em;
+  }
+  
+  /* Full bleed container */
+  .container-full {
+    @apply w-full px-4 md:px-8 lg:px-12;
+  }
+  
+  /* Nike-style button hover effect */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+  
+  /* Marquee animation */
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+  
+  .animate-marquee {
+    animation: marquee 20s linear infinite;
+  }
+  
+  /* Fade up animation */
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(60px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-up {
+    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  /* Stagger delays */
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .delay-300 { animation-delay: 0.3s; }
+  .delay-400 { animation-delay: 0.4s; }
+  .delay-500 { animation-delay: 0.5s; }
+  
+  /* ============================================
+     TYPOGRAPHY REFINEMENTS
+     Nike-style tight headlines and labels
+     ============================================ */
+  
+  .headline-lg {
+    line-height: 0.9;
+    margin-bottom: 0.2em;
+  }
+  
+  .label-text {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  
+  /* ============================================
+     SCROLL REVEAL ANIMATIONS
+     Fade in on scroll with smooth transitions
+     ============================================ */
+  
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Stagger children animations */
+  .stagger-children > * {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .stagger-children.active > *:nth-child(1) {
+    transition-delay: 0.1s;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .stagger-children.active > *:nth-child(2) {
+    transition-delay: 0.2s;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .stagger-children.active > *:nth-child(3) {
+    transition-delay: 0.3s;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Resources grid layout */
+  .resources-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  @media (max-width: 768px) {
+    .resources-grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  }
+  
+  .resource-category h3 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+  
+  .resource-category p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #525252;
+  }
+  
+  /* ============================================
+     SPACING UTILITIES - NIKE STANDARD
+     Consistent section padding across pages
+     ============================================ */
+  
+  .section-spacing {
+    @apply py-24 md:py-32 lg:py-40;
+  }
+  
+  .section-spacing-sm {
+    @apply py-16 md:py-20;
+  }
+  
+  .section-spacing-lg {
+    @apply py-32 md:py-40 lg:py-48;
+  }
+  
+  /* ============================================
+     RESPONSIVE GRID UTILITIES
+     Asymmetric layouts for Nike aesthetic
+     ============================================ */
+  
+  /* 7-5 split: Large feature on left */
+  .grid-7-5 {
+    @apply grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8;
+  }
+  
+  .grid-7-5 > :first-child {
+    @apply md:col-span-7;
+  }
+  
+  .grid-7-5 > :nth-child(n+2) {
+    @apply md:col-span-5;
+  }
+  
+  /* 8-4 split */
+  .grid-8-4 {
+    @apply grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8;
+  }
+  
+  .grid-8-4 > :first-child {
+    @apply md:col-span-8;
+  }
+  
+  .grid-8-4 > :nth-child(n+2) {
+    @apply md:col-span-4;
+  }
+  
+  /* ============================================
+     HOVER & INTERACTION STATES
+     Nike animation standards
+     ============================================ */
+  
+  .hover-lift {
+    @apply transition-all duration-300;
+  }
+  
+  .hover-lift:hover {
+    @apply transform -translate-y-2;
+  }
+  
+  .hover-scale {
+    @apply transition-transform duration-300;
+  }
+  
+  .hover-scale:hover {
+    @apply scale-105;
+  }
+  
+  /* Image zoom on hover */
+  .image-zoom {
+    overflow: hidden;
+  }
+  
+  .image-zoom img {
+    @apply transition-transform duration-500;
+  }
+  
+  .image-zoom:hover img {
+    @apply scale-110;
+  }
+  
+  /* ============================================
+     ACCESSIBILITY UTILITIES
+     Focus states and screen reader helpers
+     ============================================ */
+  
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  
+  /* Focus visible for keyboard navigation */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply outline-2 outline-offset-2 outline-black;
+  }
+  
+  /* ============================================
+     ANIMATION PRESETS
+     Ready-to-use animation combinations
+     ============================================ */
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideLeft {
+    from {
+      opacity: 0;
+      transform: translateX(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes slideRight {
+    from {
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .animate-slide-down {
+    animation: slideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .animate-slide-left {
+    animation: slideLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .animate-slide-right {
+    animation: slideRight 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 }
 
-/* Branch Theming Variables */
+/* ============================================
+   NIKE COLOR SYSTEM - HIGH CONTRAST
+   ============================================ */
+
 :root {
-  --brand-primary: #111827; /* neutral default */
-  --brand-primary-hover: #0b1220;
-  --brand-secondary: #6b7280;
-  --brand-contrast: #ffffff;
-  --brand-bg-image: none;
+  --nike-black: #000000;
+  --nike-white: #ffffff;
+  --nike-gray-100: #f5f5f5;
+  --nike-gray-200: #e5e5e5;
+  --nike-gray-400: #a3a3a3;
+  --nike-gray-600: #525252;
+  --nike-gray-800: #262626;
+  --nike-gray-900: #171717;
+  
+  /* Brand colors - simplified for Nike aesthetic */
+  --brand-primary: var(--nike-black);
+  --brand-primary-hover: var(--nike-gray-800);
+  --brand-secondary: var(--nike-gray-400);
+  --brand-accent: var(--nike-white);
+  
+  /* Military branch accents - subtle in Nike style */
+  --army-gold: #D4AF37;
+  --navy-gold: #C5B358;
+  --af-silver: #7F7F7F;
+  --marine-gold: #FBBF24;
+  --cg-red: #E4002B;
+  --sf-silver: #A7A9AC;
 }
 
-/* Army */
-[data-branch="Army"] {
-  --brand-primary: #000000; /* Army Black */
-  --brand-primary-hover: #1a1a1a;
-  --brand-secondary: #D4AF37; /* Army Gold */
-  --brand-contrast: #ffffff;
-  --brand-bg-image: url('/branch-logos/army.svg');
+/* ============================================
+   NIKE-STYLE HEADER
+   Minimal, floating, transparent-to-solid
+   ============================================ */
+
+.site-header {
+  @apply fixed top-0 left-0 right-0 z-50 transition-all duration-500;
+  background: transparent;
+  backdrop-filter: blur(0px);
 }
 
-/* Navy */
-[data-branch="Navy"] {
-  --brand-primary: #001F3F; /* Navy Blue */
-  --brand-primary-hover: #001836;
-  --brand-secondary: #C5B358; /* Navy Gold */
-  --brand-contrast: #ffffff;
-  --brand-bg-image: url('/branch-logos/navy.svg');
+/* Transparent on dark hero with white text */
+.site-header.dark-mode {
+  background: transparent;
+  backdrop-filter: blur(0px);
 }
 
-/* Air Force */
-[data-branch="Air Force"] {
-  --brand-primary: #00308F; /* Air Force Blue */
-  --brand-primary-hover: #00266f;
-  --brand-secondary: #7F7F7F; /* Air Force Silver */
-  --brand-contrast: #ffffff;
-  --brand-bg-image: url('/branch-logos/air-force.svg');
+.site-header.dark-mode a,
+.site-header.dark-mode button {
+  @apply text-white;
 }
 
-/* Marine Corps */
-[data-branch="Marine Corps"] {
-  --brand-primary: #CC0000; /* Scarlet Red */
-  --brand-primary-hover: #a30000;
-  --brand-secondary: #FBBF24; /* Marine Corps Gold */
-  --brand-contrast: #ffffff;
-  --brand-bg-image: url('/branch-logos/marine-corps.svg');
+.site-header.dark-mode .nav-link {
+  @apply text-white border-white/30;
 }
 
-/* Coast Guard */
-[data-branch="Coast Guard"] {
-  --brand-primary: #0053A5; /* CG Blue */
-  --brand-primary-hover: #004687;
-  --brand-secondary: #E4002B; /* CG Red */
-  --brand-contrast: #ffffff;
-  --brand-bg-image: url('/branch-logos/coast-guard.svg');
+.site-header.dark-mode .nav-link:hover {
+  @apply text-white bg-white/10 border-white/60;
 }
 
-/* Space Force */
-[data-branch="Space Force"] {
-  --brand-primary: #2F1A47; /* Dark Purple */
-  --brand-primary-hover: #231436;
-  --brand-secondary: #A7A9AC; /* Silver */
-  --brand-contrast: #ffffff;
-  --brand-bg-image: url('/branch-logos/space-force.svg');
+/* Solid white on scroll with blur */
+.site-header.scrolled {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--nike-gray-200);
 }
 
-/* Header and common accents themed by branch */
-[data-branch] .site-header {
-  background-color: var(--brand-primary) !important;
-  border-color: var(--brand-secondary) !important;
-  color: var(--brand-contrast) !important;
+.site-header.scrolled a,
+.site-header.scrolled button {
+  @apply text-black;
 }
 
-[data-branch] .site-header a,
-[data-branch] .site-header button {
-  color: var(--brand-contrast) !important;
-  border-color: color-mix(in oklab, var(--brand-secondary) 70%, transparent) !important;
+.site-header.scrolled .nav-link {
+  @apply text-black border-black/20 bg-white;
 }
 
-[data-branch] .site-header button:hover {
-  background-color: color-mix(in oklab, var(--brand-contrast) 10%, transparent) !important;
+.site-header.scrolled .nav-link:hover {
+  @apply text-black bg-black/5 border-black/40;
 }
 
-/* Global link color accents */
-[data-branch] a {
-  color: var(--brand-primary);
-}
-[data-branch] a:hover {
-  color: var(--brand-primary-hover);
+/* Navigation links - Nike style */
+.nav-link {
+  @apply text-sm font-bold uppercase tracking-wide transition-all duration-200 px-3 py-1.5 border border-transparent rounded-full;
+  letter-spacing: 0.05em;
 }
 
-/* Subtle watermark background */
-[data-branch] body {
-  background-image: var(--brand-bg-image);
-  background-repeat: no-repeat;
-  background-position: center 20vh;
-  background-size: min(60vw, 800px);
+.nav-link:hover {
+  @apply text-black;
+}
+
+/* Subtle dashboard texture */
+.dashboard-bg {
+  background-color: #fafafa;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* ============================================
+   HERO SECTION - FULL BLEED IMPACT
+   ============================================ */
+
+.hero-section {
+  @apply relative w-full min-h-screen flex items-center justify-center overflow-hidden;
+  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)), url('/soldier-action.jpg');
+  background-size: cover;
+  background-position: center;
   background-attachment: fixed;
+}
+
+.hero-section::before {
+  content: '';
+  @apply absolute inset-0 z-0;
+  background: rgba(0,0,0,0.5);
+}
+
+.hero-bg {
+  @apply absolute inset-0 z-0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.7);
+}
+
+.hero-content {
+  @apply relative z-10 text-center px-4 max-w-7xl mx-auto;
+}
+
+.hero-headline {
+  @apply text-white mb-6 opacity-0;
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+  text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+}
+
+.hero-subheadline {
+  @apply text-white/90 text-xl md:text-2xl font-medium mb-8 max-w-2xl mx-auto opacity-0;
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+}
+
+/* ============================================
+   NIKE BUTTON SYSTEM
+   Bold, pill-shaped or sharp, high contrast
+   ============================================ */
+
+.btn-nike {
+  @apply inline-flex items-center justify-center px-8 py-4 text-sm font-bold uppercase tracking-wider transition-all duration-300 rounded-none;
+  letter-spacing: 0.1em;
+  min-height: 56px;
+}
+
+.btn-nike-primary {
+  @apply bg-black text-white hover:bg-gray-800 hover:scale-105;
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+}
+
+.btn-nike-secondary {
+  @apply bg-white text-black border-2 border-black hover:bg-black hover:text-white;
+}
+
+.btn-nike-white {
+  @apply bg-white text-black hover:bg-gray-100 hover:scale-105;
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.3);
+}
+
+.btn-nike-outline-white {
+  @apply bg-transparent text-white border-2 border-white hover:bg-white hover:text-black;
+}
+
+/* Sharp variant for aggressive look */
+.btn-nike-sharp {
+  @apply rounded-none;
+}
+
+/* Large CTA */
+.btn-nike-large {
+  @apply px-12 py-5 text-base;
+  min-height: 64px;
+}
+
+/* ============================================
+   CARD SYSTEM - MINIMAL, BOLD
+   ============================================ */
+
+.card-nike {
+  @apply relative bg-white overflow-hidden transition-all duration-500;
+}
+
+.card-nike:hover {
+  transform: translateY(-8px);
+}
+
+.card-nike-image {
+  @apply relative w-full aspect-[4/5] overflow-hidden bg-gray-100;
+}
+
+.card-nike-image img {
+  @apply w-full h-full object-cover transition-transform duration-700;
+}
+
+.card-nike:hover .card-nike-image img {
+  transform: scale(1.05);
+}
+
+.card-nike-content {
+  @apply p-6 md:p-8;
+}
+
+.card-nike-title {
+  @apply text-xl md:text-2xl font-black uppercase tracking-tight mb-2;
+  letter-spacing: -0.02em;
+}
+
+.card-nike-subtitle {
+  @apply text-sm font-bold text-gray-500 uppercase tracking-wider;
+  letter-spacing: 0.1em;
+}
+
+/* Dark variant */
+.card-nike-dark {
+  @apply bg-black text-white;
+}
+
+.card-nike-dark .card-nike-subtitle {
+  @apply text-gray-400;
+}
+
+/* ============================================
+   GRID SYSTEM - ASYMMETRIC NIKE LAYOUTS
+   ============================================ */
+
+.grid-nike {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6;
+}
+
+.grid-nike-featured {
+  @apply grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6;
+}
+
+.grid-nike-featured > *:first-child {
+  @apply lg:col-span-8 lg:row-span-2;
+}
+
+.grid-nike-featured > *:nth-child(2),
+.grid-nike-featured > *:nth-child(3) {
+  @apply lg:col-span-4;
+}
+
+/* Full bleed sections */
+.section-full {
+  @apply w-full py-20 md:py-32 lg:py-40;
+}
+
+.section-black {
+  @apply bg-black text-white;
+}
+
+.section-gray {
+  @apply bg-gray-50;
+}
+
+/* ============================================
+   TYPOGRAPHY TREATMENTS - NIKE STYLE
+   ============================================ */
+
+.headline-xl {
+  @apply text-6xl md:text-8xl lg:text-9xl font-black uppercase leading-none tracking-tighter;
+  letter-spacing: -0.04em;
+}
+
+.headline-lg {
+  @apply text-4xl md:text-6xl lg:text-7xl font-black uppercase leading-none tracking-tighter;
+  letter-spacing: -0.03em;
+}
+
+.headline-md {
+  @apply text-3xl md:text-4xl lg:text-5xl font-black uppercase leading-tight tracking-tight;
+  letter-spacing: -0.02em;
+}
+
+.body-large {
+  @apply text-lg md:text-xl font-medium leading-relaxed text-gray-600;
+}
+
+.label-text {
+  @apply text-xs font-bold uppercase tracking-widest text-gray-500;
+  letter-spacing: 0.2em;
+}
+
+/* Text overlay on images */
+.text-overlay {
+  @apply absolute inset-0 flex flex-col justify-end p-8 md:p-12;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%);
+}
+
+/* ============================================
+   MARQUEE / SCROLLING TEXT
+   ============================================ */
+
+.marquee-container {
+  @apply w-full overflow-hidden py-8 bg-black text-white;
+}
+
+.marquee-content {
+  @apply flex whitespace-nowrap;
+  animation: marquee 30s linear infinite;
+}
+
+.marquee-text {
+  @apply text-6xl md:text-8xl font-black uppercase tracking-tighter mx-8;
+  letter-spacing: -0.04em;
+}
+
+/* ============================================
+   MILITARY BRANCH THEMING - NIKE MINIMAL
+   Subtle accents only, no watermarks/backgrounds
+   ============================================ */
+
+[data-branch] {
+  --accent-color: var(--nike-black);
+}
+
+[data-branch="Army"] {
+  --accent-color: var(--army-gold);
+}
+
+[data-branch="Navy"] {
+  --accent-color: var(--navy-gold);
+}
+
+[data-branch="Air Force"] {
+  --accent-color: var(--af-silver);
+}
+
+[data-branch="Marine Corps"] {
+  --accent-color: var(--marine-gold);
+}
+
+[data-branch="Coast Guard"] {
+  --accent-color: var(--cg-red);
+}
+
+[data-branch="Space Force"] {
+  --accent-color: var(--sf-silver);
+}
+
+/* Subtle accent applications - buttons and borders only */
+[data-branch] .accent-text {
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+[data-branch] .accent-border {
+  border: 2px solid var(--accent-color);
+}
+
+[data-branch] .accent-bg {
+  background-color: var(--accent-color);
+  color: var(--nike-black);
+  font-weight: 700;
+}
+
+/* Removed: branch watermark backgrounds, body background-images */
+/* Keep ONLY: subtle accent colors for interactive elements */
+[data-branch] body {
+  /* No background images or watermarks - pure black/white aesthetic */
+  background-color: var(--nike-white);
+}
+
+/* Branch indicator pill */
+.branch-pill {
+  @apply inline-flex items-center px-4 py-2 rounded-none text-xs font-bold uppercase tracking-widest;
+  letter-spacing: 0.15em;
+  background: var(--accent-color);
+  color: var(--nike-black);
+}
+
+/* ============================================
+   INTERACTIVE ELEMENTS
+   ============================================ */
+
+/* Custom cursor for interactive elements */
+.cursor-hover {
+  @apply cursor-pointer;
+}
+
+/* Image hover zoom container */
+.hover-zoom {
+  @apply overflow-hidden;
+}
+
+.hover-zoom img {
+  @apply transition-transform duration-700 ease-out;
+}
+
+.hover-zoom:hover img {
+  transform: scale(1.08);
+}
+
+/* Link underline animation */
+.link-underline {
+  @apply relative inline-block;
+}
+
+.link-underline::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-0 h-0.5 bg-current transition-all duration-300;
+}
+
+.link-underline:hover::after {
+  @apply w-full;
+}
+
+/* ============================================
+   STICKY SECTION HEADERS
+   ============================================ */
+
+.sticky-header {
+  @apply sticky top-0 z-40 bg-white py-6 md:py-8 border-b-2 border-black;
+}
+
+.sticky-header h2 {
+  @apply text-3xl md:text-5xl font-black uppercase tracking-tighter;
+}
+
+/* ============================================
+   HORIZONTAL CARD CAROUSEL
+   ============================================ */
+
+.carousel-container {
+  @apply w-full overflow-x-auto hide-scrollbar snap-x snap-mandatory flex gap-6 md:gap-8 py-4 px-4 md:px-6;
+  scroll-behavior: smooth;
+}
+
+.carousel-item {
+  @apply flex-shrink-0 w-full md:w-96 lg:w-1/3 snap-start;
+}
+
+.carousel-item:last-child {
+  @apply mr-4 md:mr-6;
+}
+
+/* Mobile horizontal scroll for feature cards */
+@media (max-width: 768px) {
+  .carousel-container {
+    @apply -mx-4 px-4;
+  }
+}
+
+/* ============================================
+   FOOTER - MINIMAL NIKE STYLE
+   ============================================ */
+
+.footer-nike {
+  @apply bg-black text-white py-16 md:py-24;
+}
+
+.footer-grid {
+  @apply grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 md:gap-12;
+}
+
+.footer-column h4 {
+  @apply text-sm font-bold uppercase tracking-wider mb-6 text-gray-400;
+  letter-spacing: 0.1em;
+}
+
+.footer-column ul {
+  @apply space-y-3;
+}
+
+.footer-column a {
+  @apply text-sm text-gray-300 hover:text-white transition-colors duration-200;
+}
+
+.footer-bottom {
+  @apply mt-16 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4;
+}
+
+/* ============================================
+   PAGE SECTION TRANSITIONS
+   ============================================ */
+
+.section-transition {
+  @apply transition-all duration-500 ease-out;
+}
+
+.section-entrance {
+  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================
+   ANIMATIONS & MICRO-INTERACTIONS
+   ============================================ */
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Parallax scroll effect */
+.parallax {
+  @apply relative;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply bg-gray-200 animate-pulse rounded-none;
+}
+
+/* ============================================
+   UTILITIES & HELPERS
+   ============================================ */
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Aspect ratios */
+.aspect-nike {
+  aspect-ratio: 4/5;
+}
+
+.aspect-hero {
+  aspect-ratio: 16/9;
+}
+
+.aspect-square-nike {
+  aspect-ratio: 1/1;
+}
+
+/* Text truncation */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Focus states for accessibility */
+.focus-ring:focus-visible {
+  @apply outline-none ring-2 ring-black ring-offset-2;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .parallax {
+    transform: none !important;
+  }
 }

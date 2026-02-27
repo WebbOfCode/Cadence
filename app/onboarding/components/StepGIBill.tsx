@@ -59,7 +59,7 @@ export function StepGIBill({ onNext, onBack }: StepGIBillProps) {
         </div>
 
         {/* VocRehab Priority Notice */}
-        <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+        <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-none">
           <div className="flex gap-3">
             <span className="text-2xl">💡</span>
             <div className="space-y-2">
@@ -82,7 +82,7 @@ export function StepGIBill({ onNext, onBack }: StepGIBillProps) {
 
         {/* Discharge Type Warning */}
         {hasDischargeWarning && (
-          <div className="p-4 bg-yellow-50 border-2 border-yellow-300 rounded-lg">
+          <div className="p-4 bg-yellow-50 border-2 border-yellow-300 rounded-none">
             <div className="flex gap-3">
               <span className="text-2xl">⚠️</span>
               <div className="space-y-2">

@@ -56,7 +56,7 @@ export function StepLocation({ onNext, onBack }: StepLocationProps) {
             id="location"
             type="text"
             {...register('location')}
-            className="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors"
+            className="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-none focus:border-black focus:outline-none transition-colors"
             placeholder="Austin, TX"
             autoFocus
           />

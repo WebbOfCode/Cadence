@@ -74,15 +74,7 @@ export function Summary({ onBack }: SummaryProps) {
       console.log('Mission plan generated successfully');
       setMissionPlan(missionPlan);
       
-      // If user has MOS and location, offer to view MOS Scanner
-      if (data.mos && data.location) {
-        const viewScanner = confirm('Your mission plan is ready! Would you like to view personalized career pathways based on your MOS now?');
-        if (viewScanner) {
-          router.push('/mos-scanner');
-          return;
-        }
-      }
-      
+      // Redirect to dashboard
       router.push('/dashboard');
     } catch (err) {
       console.error('Failed to generate mission plan:', err);
@@ -105,7 +97,7 @@ export function Summary({ onBack }: SummaryProps) {
           </p>
         </div>
 
-        <div className="space-y-6 p-6 bg-gray-50 rounded-lg">
+        <div className="space-y-6 p-6 bg-gray-50 rounded-none">
           <div>
             <p className="text-sm font-medium uppercase tracking-wide text-gray-500">Name</p>
             <p className="text-lg mt-1">{data.name}</p>
@@ -199,7 +191,7 @@ export function Summary({ onBack }: SummaryProps) {
         </div>
 
         {error && (
-          <div className="p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+          <div className="p-4 bg-red-50 border-2 border-red-200 rounded-none">
             <p className="text-sm font-medium text-red-700 mb-1">Error</p>
             <p className="text-sm text-red-600">{error}</p>
           </div>
@@ -210,7 +202,7 @@ export function Summary({ onBack }: SummaryProps) {
             type="button"
             onClick={onBack}
             disabled={isGenerating}
-            className="flex-1 py-4 border-2 border-black text-black font-medium rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="flex-1 py-4 border-2 border-black text-black font-medium rounded-none hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
             Back
           </button>
@@ -218,12 +210,13 @@ export function Summary({ onBack }: SummaryProps) {
             type="button"
             onClick={handleFinish}
             disabled={isGenerating}
-            className="flex-1 py-4 bg-black text-white font-medium rounded-lg hover:bg-gray-800 disabled:bg-gray-400 transition-colors"
+            className="flex-1 py-4 bg-black text-white font-medium rounded-none hover:bg-gray-800 disabled:bg-gray-400 transition-colors"
           >
             {isGenerating ? 'Generating Your Plan...' : 'Finish Setup'}
           </button>
         </div>
       </div>
     </StepWrapper>
-  );
-}
+    );
+  }
+

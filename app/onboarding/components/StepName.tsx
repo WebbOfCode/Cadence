@@ -56,7 +56,7 @@ export function StepName({ onNext }: StepNameProps) {
             id="name"
             type="text"
             {...register('name')}
-            className="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors"
+            className="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-none focus:border-black focus:outline-none transition-colors"
             placeholder="John Smith"
             autoFocus
           />
@@ -68,7 +68,7 @@ export function StepName({ onNext }: StepNameProps) {
         <button
           type="submit"
           disabled={!isValid}
-          className="w-full py-4 bg-black text-white font-medium rounded-lg hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
+          className="w-full py-4 bg-black text-white font-medium rounded-none hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
         >
           Continue
         </button>

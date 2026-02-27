@@ -166,6 +166,97 @@ export default function DashboardPage() {
     return null;
   }
 
+  // Define helper functions before they're used in calculations
+  const daysBetween = (futureDate: Date, startDate: Date) => {
+    return Math.ceil((futureDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
+  const getComplexityScore = (task: MissionTask) => {
+    const stepWeight = (task.steps?.length || 1) * 12;
+    const priorityWeight = task.priority === 'high' ? 40 : task.priority === 'medium' ? 25 : 10;
+    const coreWeight = task.core ? 8 : 0;
+    return Math.min(100, stepWeight + priorityWeight + coreWeight);
+  };
+
+  const getTimelineMeta = (task: MissionTask) => {
+    if (task.deadline) {
+      const daysLeft = daysBetween(new Date(task.deadline), new Date());
+      const horizon = Math.max(14, Math.min(120, daysLeft + 30));
+      const score = Math.max(0, Math.min(100, 100 - (daysLeft / horizon) * 100));
+      const label = daysLeft <= 0 ? 'Overdue' : `${daysLeft} days left`;
+      return { score, label };
+    }
+
+    const fallbackScore = task.priority === 'high' ? 70 : task.priority === 'medium' ? 45 : 30;
+    return { score: fallbackScore, label: 'No deadline set' };
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return 'bg-red-100 text-red-700 border-red-300';
+      case 'medium':
+        return 'bg-amber-100 text-amber-700 border-amber-300';
+      case 'low':
+        return 'bg-blue-100 text-blue-700 border-blue-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+            className="mb-6 p-6 bg-black text-white rounded-2xl"
+
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    const labels: Record<string, string> = {
+                <h2 className="text-sm font-bold uppercase tracking-wide mb-1">NCO Guidance: VA Healthcare</h2>
+                <p className="text-sm text-gray-400 mb-2">
+      career: 'Career',
+      education: 'Education',
+      housing: 'Housing',
+                  <a href="https://www.va.gov/health-care/how-to-apply/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">Apply on VA.gov</a>
+                  <a href="https://www.va.gov/find-locations/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">Find VA Facility</a>
+    };
+                <p className="text-xs text-gray-400 mt-3">Cadence provides guidance, not legal advice.</p>
+  };
+
+  const getComplexityLabel = (score: number) => {
+    if (score >= 75) return 'Heavy lift';
+                  className="px-4 py-2 bg-white text-black font-bold uppercase text-xs rounded-full hover:scale-105 transition-transform"
+    return 'Quick win';
+  };
+
+  const getBarTone = (score: number) => {
+    if (score >= 75) return 'bg-red-500';
+    if (score >= 45) return 'bg-amber-500';
+    return 'bg-emerald-500';
+  };
+
+  const formatRelativeTime = (date: Date) => {
+    const diffMs = Date.now() - date.getTime();
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    if (diffMinutes < 1) return 'just now';
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+  };
+
+  const toggleSection = (key: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const handleSaveProgress = () => {
+    if (saveState === 'saving') return;
+    setSaveState('saving');
+    setTimeout(() => {
+      updateData({ lastSavedAt: new Date().toISOString() });
+      setSaveState('saved');
+      setTimeout(() => setSaveState('idle'), 1800);
+    }, 450);
+  };
+
   const tasks = missionPlan.tasks;
   const daysUntilETS = data.etsDate ? getDaysUntilETS(data.etsDate) : 0;
   const completedCount = tasks.filter((t) => t.completed).length;
@@ -323,100 +414,10 @@ export default function DashboardPage() {
     );
   }
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-100 text-red-700 border-red-300';
-      case 'medium':
-        return 'bg-amber-100 text-amber-700 border-amber-300';
-      case 'low':
-        return 'bg-blue-100 text-blue-700 border-blue-300';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const getCategoryLabel = (category: string) => {
-    const labels: Record<string, string> = {
-      admin: 'Admin',
-      healthcare: 'Healthcare',
-      career: 'Career',
-      education: 'Education',
-      housing: 'Housing',
-      finance: 'Finance',
-      wellness: 'Wellness',
-    };
-    return labels[category] || category;
-  };
-
-  const daysBetween = (futureDate: Date, startDate: Date) => {
-    return Math.ceil((futureDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-  };
-
-  const getComplexityScore = (task: MissionTask) => {
-    const stepWeight = (task.steps?.length || 1) * 12;
-    const priorityWeight = task.priority === 'high' ? 40 : task.priority === 'medium' ? 25 : 10;
-    const coreWeight = task.core ? 8 : 0;
-    return Math.min(100, stepWeight + priorityWeight + coreWeight);
-  };
-
-  const getComplexityLabel = (score: number) => {
-    if (score >= 75) return 'Heavy lift';
-    if (score >= 45) return 'Moderate effort';
-    return 'Quick win';
-  };
-
-  const getBarTone = (score: number) => {
-    if (score >= 75) return 'bg-red-500';
-    if (score >= 45) return 'bg-amber-500';
-    return 'bg-emerald-500';
-  };
-
-  const getTimelineMeta = (task: MissionTask) => {
-    if (task.deadline) {
-      const daysLeft = daysBetween(new Date(task.deadline), new Date());
-      const horizon = Math.max(14, Math.min(120, daysLeft + 30));
-      const score = Math.max(0, Math.min(100, 100 - (daysLeft / horizon) * 100));
-      const label = daysLeft <= 0 ? 'Overdue' : `${daysLeft} days left`;
-      return { score, label };
-    }
-
-    const fallbackScore = task.priority === 'high' ? 70 : task.priority === 'medium' ? 45 : 30;
-    return { score: fallbackScore, label: 'No deadline set' };
-  };
-
-  const formatRelativeTime = (date: Date) => {
-    const diffMs = Date.now() - date.getTime();
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    if (diffMinutes < 1) return 'just now';
-    if (diffMinutes < 60) return `${diffMinutes}m ago`;
-    const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
-  };
-
-  const toggleSection = (key: string) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
-
-  const handleSaveProgress = () => {
-    if (saveState === 'saving') return;
-    setSaveState('saving');
-    setTimeout(() => {
-      updateData({ lastSavedAt: new Date().toISOString() });
-      setSaveState('saved');
-      setTimeout(() => setSaveState('idle'), 1800);
-    }, 450);
-  };
-
   const lastSavedAt = data.lastSavedAt ? new Date(data.lastSavedAt) : null;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen dashboard-bg">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
         {/* Header */}
         <div className="mb-10 md:mb-12 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
@@ -443,11 +444,11 @@ export default function DashboardPage() {
           <div className="flex flex-wrap gap-3 justify-end">
             <button
               onClick={handleSaveProgress}
-              className={`flex items-center gap-2 px-4 py-3 rounded-lg border-2 font-medium transition-colors ${
+              className={`flex items-center gap-2 px-6 py-3 rounded-full border-2 font-bold uppercase text-xs tracking-wider transition-all hover:scale-105 ${
                 saveState === 'saved'
-                  ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
+                  ? 'border-emerald-600 bg-emerald-600 text-white'
                   : saveState === 'saving'
-                    ? 'border-gray-300 bg-gray-50 text-gray-700'
+                    ? 'border-gray-400 bg-gray-100 text-gray-800'
                     : 'border-black bg-black text-white hover:bg-gray-900'
               }`}
             >
@@ -458,14 +459,14 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={() => setIsEditGoalsOpen(true)}
-              className="flex items-center gap-2 px-4 py-3 border-2 border-gray-200 rounded-lg hover:border-black transition-colors font-medium"
+              className="flex items-center gap-2 px-6 py-3 border-2 border-black text-black font-bold uppercase text-xs tracking-wider rounded-full hover:bg-black hover:text-white transition-all"
             >
               <Settings size={20} />
               Edit Goals
             </button>
             <button
               onClick={exportMissionPlan}
-              className="flex items-center gap-2 px-4 py-3 border-2 border-gray-200 rounded-lg hover:border-black transition-colors font-medium"
+              className="flex items-center gap-2 px-6 py-3 border-2 border-black text-black font-bold uppercase text-xs tracking-wider rounded-full hover:bg-black hover:text-white transition-all"
             >
               <Download size={20} />
               Export
@@ -493,25 +494,25 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.03 }}
-            className="mb-6 p-6 border-2 border-amber-300 bg-amber-50 rounded-lg"
+            className="mb-6 p-6 bg-black text-white rounded-2xl"
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex-1">
-                <h2 className="text-lg font-bold text-gray-900 mb-1">NCO Guidance: Try a Discharge Upgrade</h2>
-                <p className="text-sm text-gray-700 mb-2">
+                <h2 className="text-sm font-bold uppercase tracking-wide mb-1">NCO Guidance: Discharge Upgrade</h2>
+                <p className="text-sm text-gray-400 mb-2">
                   Discharge upgrades are <strong>common</strong> and applying <strong>does not</strong> reduce current benefits or harm VA claims. Many veterans succeed years after separation using new evidence, time passed, or inequities.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <a href="https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0293.pdf" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">DD Form 293</a>
-                  <a href="https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0149.pdf" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">DD Form 149</a>
-                  <a href="https://www.dav.org/find-your-local-dav-office/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">Find DAV Office</a>
+                  <a href="https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0293.pdf" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">DD Form 293</a>
+                  <a href="https://www.esd.whs.mil/Portals/54/Documents/DD/forms/dd/dd0149.pdf" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">DD Form 149</a>
+                  <a href="https://www.dav.org/find-your-local-dav-office/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">Find DAV Office</a>
                 </div>
-                <p className="text-xs text-gray-600 mt-3">Cadence provides guidance, not legal advice. No guarantees of approval.</p>
+                <p className="text-xs text-gray-400 mt-3">Cadence provides guidance, not legal advice. No guarantees of approval.</p>
               </div>
               <div className="flex-shrink-0">
                 <button
                   onClick={() => updateData({ dischargeUpgradeBannerDismissed: true })}
-                  className="px-3 py-2 text-sm border-2 border-gray-300 rounded hover:border-gray-400"
+                  className="px-4 py-2 bg-white text-black font-bold uppercase text-xs rounded-full hover:scale-105 transition-transform"
                 >
                   Dismiss
                 </button>
@@ -526,25 +527,25 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.04 }}
-            className="mb-6 p-6 border-2 border-amber-300 bg-amber-50 rounded-lg"
+            className="mb-6 p-6 bg-black text-white rounded-2xl"
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex-1">
-                <h2 className="text-lg font-bold text-gray-900 mb-1">NCO Guidance: File Your Disability Claim</h2>
-                <p className="text-sm text-gray-700 mb-2">
+                <h2 className="text-sm font-bold uppercase tracking-wide mb-1">NCO Guidance: Disability Claim</h2>
+                <p className="text-sm text-gray-400 mb-2">
                   Filing is <strong>common</strong> and <strong>low-risk</strong>. It won’t hurt existing benefits, and you can add evidence later. Many veterans wait—don’t miss out.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <a href="https://www.va.gov/disability/how-to-file-claim/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">File on VA.gov</a>
-                  <a href="https://www.dav.org/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">DAV Help</a>
-                  <a href="https://www.vfw.org/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">VFW Support</a>
+                  <a href="https://www.va.gov/disability/how-to-file-claim/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">File on VA.gov</a>
+                  <a href="https://www.dav.org/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">DAV Help</a>
+                  <a href="https://www.vfw.org/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">VFW Support</a>
                 </div>
-                <p className="text-xs text-gray-600 mt-3">Cadence provides guidance, not legal advice. No guarantees of approval.</p>
+                <p className="text-xs text-gray-400 mt-3">Cadence provides guidance, not legal advice. No guarantees of approval.</p>
               </div>
               <div className="flex-shrink-0">
                 <button
                   onClick={() => updateData({ ncoBannerDismissedKeys: [ ...(data.ncoBannerDismissedKeys || []), 'disability-claim' ] })}
-                  className="px-3 py-2 text-sm border-2 border-gray-300 rounded hover:border-gray-400"
+                  className="px-4 py-2 bg-white text-black font-bold uppercase text-xs rounded-full hover:scale-105 transition-transform"
                 >
                   Dismiss
                 </button>
@@ -562,24 +563,24 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="mb-6 p-6 border-2 border-amber-300 bg-amber-50 rounded-lg"
+            className="mb-6 p-6 bg-black text-white rounded-2xl"
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex-1">
-                <h2 className="text-lg font-bold text-gray-900 mb-1">NCO Guidance: Enroll in VA Healthcare</h2>
-                <p className="text-sm text-gray-700 mb-2">
+                <h2 className="text-sm font-bold uppercase tracking-wide mb-1">NCO Guidance: VA Healthcare</h2>
+                <p className="text-sm text-gray-400 mb-2">
                   Enrollment is straightforward and many delay it. Starting care early helps with continuity and claims. Enrollment does not harm other benefits.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <a href="https://www.va.gov/health-care/how-to-apply/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">Apply on VA.gov</a>
-                  <a href="https://www.va.gov/find-locations/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">Find VA Facility</a>
+                  <a href="https://www.va.gov/health-care/how-to-apply/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">Apply on VA.gov</a>
+                  <a href="https://www.va.gov/find-locations/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">Find VA Facility</a>
                 </div>
-                <p className="text-xs text-gray-600 mt-3">Cadence provides guidance, not legal advice.</p>
+                <p className="text-xs text-gray-400 mt-3">Cadence provides guidance, not legal advice.</p>
               </div>
               <div className="flex-shrink-0">
                 <button
                   onClick={() => updateData({ ncoBannerDismissedKeys: [ ...(data.ncoBannerDismissedKeys || []), 'va-healthcare' ] })}
-                  className="px-3 py-2 text-sm border-2 border-gray-300 rounded hover:border-gray-400"
+                  className="px-4 py-2 bg-white text-black font-bold uppercase text-xs rounded-full hover:scale-105 transition-transform"
                 >
                   Dismiss
                 </button>
@@ -594,24 +595,24 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.06 }}
-            className="mb-6 p-6 border-2 border-amber-300 bg-amber-50 rounded-lg"
+            className="mb-6 p-6 bg-black text-white rounded-2xl"
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex-1">
-                <h2 className="text-lg font-bold text-gray-900 mb-1">NCO Guidance: Use Your GI Bill</h2>
-                <p className="text-sm text-gray-700 mb-2">
+                <h2 className="text-sm font-bold uppercase tracking-wide mb-1">NCO Guidance: Use Your GI Bill</h2>
+                <p className="text-sm text-gray-400 mb-2">
                   Education benefits are powerful. Many wait to apply—don’t. Applying is simple and does not negatively affect other benefits.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <a href="https://www.va.gov/education/how-to-apply/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">Apply on VA.gov</a>
-                  <a href="https://www.benefits.va.gov/gibill/comparison_tool.asp" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">GI Bill Comparison Tool</a>
+                  <a href="https://www.va.gov/education/how-to-apply/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">Apply on VA.gov</a>
+                  <a href="https://www.benefits.va.gov/gibill/comparison_tool.asp" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">GI Bill Comparison Tool</a>
                 </div>
-                <p className="text-xs text-gray-600 mt-3">Cadence provides guidance, not legal advice.</p>
+                <p className="text-xs text-gray-400 mt-3">Cadence provides guidance, not legal advice.</p>
               </div>
               <div className="flex-shrink-0">
                 <button
                   onClick={() => updateData({ ncoBannerDismissedKeys: [ ...(data.ncoBannerDismissedKeys || []), 'gi-bill' ] })}
-                  className="px-3 py-2 text-sm border-2 border-gray-300 rounded hover:border-gray-400"
+                  className="px-4 py-2 bg-white text-black font-bold uppercase text-xs rounded-full hover:scale-105 transition-transform"
                 >
                   Dismiss
                 </button>
@@ -626,24 +627,24 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.07 }}
-            className="mb-6 p-6 border-2 border-amber-300 bg-amber-50 rounded-lg"
+            className="mb-6 p-6 bg-black text-white rounded-2xl"
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex-1">
-                <h2 className="text-lg font-bold text-gray-900 mb-1">NCO Guidance: Request Your VA Loan COE</h2>
-                <p className="text-sm text-gray-700 mb-2">
+                <h2 className="text-sm font-bold uppercase tracking-wide mb-1">NCO Guidance: VA Loan COE</h2>
+                <p className="text-sm text-gray-400 mb-2">
                   Getting your Certificate of Eligibility early keeps home options open. It’s quick and does not affect other benefits.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <a href="https://www.va.gov/housing-assistance/home-loans/request-coe-form-26-1880/introduction" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">Request COE</a>
-                  <a href="https://www.va.gov/housing-assistance/home-loans/" target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-white border-2 border-gray-300 rounded hover:border-gray-400">VA Loan Guide</a>
+                  <a href="https://www.va.gov/housing-assistance/home-loans/request-coe-form-26-1880/introduction" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">Request COE</a>
+                  <a href="https://www.va.gov/housing-assistance/home-loans/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">VA Loan Guide</a>
                 </div>
-                <p className="text-xs text-gray-600 mt-3">Cadence provides guidance, not legal advice.</p>
+                <p className="text-xs text-gray-400 mt-3">Cadence provides guidance, not legal advice.</p>
               </div>
               <div className="flex-shrink-0">
                 <button
                   onClick={() => updateData({ ncoBannerDismissedKeys: [ ...(data.ncoBannerDismissedKeys || []), 'va-loan-coe' ] })}
-                  className="px-3 py-2 text-sm border-2 border-gray-300 rounded hover:border-gray-400"
+                  className="px-4 py-2 bg-white text-black font-bold uppercase text-xs rounded-full hover:scale-105 transition-transform"
                 >
                   Dismiss
                 </button>
@@ -677,33 +678,33 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8 md:mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 md:mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="p-6 border-2 border-gray-200 rounded-lg"
+            className="p-6 bg-black text-white rounded-2xl"
           >
-            <p className="text-sm font-medium uppercase tracking-wide text-gray-500 mb-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">
               Days Until ETS
             </p>
-            <p className="text-5xl font-bold">{daysUntilETS}</p>
-            <p className="text-sm text-gray-600 mt-2">{data.etsDate && formatDate(data.etsDate)}</p>
+            <p className="text-5xl font-black">{daysUntilETS}</p>
+            <p className="text-sm text-gray-400 mt-2">{data.etsDate && formatDate(data.etsDate)}</p>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="p-6 border-2 border-gray-200 rounded-lg"
+            className="p-6 bg-black text-white rounded-2xl"
           >
-            <p className="text-sm font-medium uppercase tracking-wide text-gray-500 mb-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">
               Tasks Completed
             </p>
-            <p className="text-5xl font-bold">{completedCount}/{tasks.length}</p>
-            <div className="w-full h-2 bg-gray-100 rounded-full mt-4">
+            <p className="text-5xl font-black">{completedCount}/{tasks.length}</p>
+            <div className="w-full h-2 bg-gray-800 rounded-full mt-4 overflow-hidden">
               <motion.div
-                className="h-full bg-black rounded-full"
+                className="h-full bg-white"
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 0.5, delay: 0.3 }}
@@ -715,44 +716,44 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="p-6 border-2 border-gray-200 rounded-lg"
+            className="p-6 bg-black text-white rounded-2xl"
           >
-            <p className="text-sm font-medium uppercase tracking-wide text-gray-500 mb-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">
               Primary Goal
             </p>
-            <p className="text-2xl font-bold">{data.goal && getGoalLabel(data.goal)}</p>
-            <p className="text-sm text-gray-600 mt-2">{data.branch} • {data.mos}</p>
+            <p className="text-2xl font-black">{data.goal && getGoalLabel(data.goal)}</p>
+            <p className="text-sm text-gray-400 mt-2">{data.branch} • {data.mos}</p>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35 }}
-            className="p-6 border-2 border-gray-200 rounded-lg"
+            className="p-6 bg-black text-white rounded-2xl"
           >
-            <p className="text-sm font-medium uppercase tracking-wide text-gray-500 mb-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">
               Effort & Time
             </p>
             <div className="space-y-4">
               <div>
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
                   <span>Average Complexity</span>
-                  <span className="font-semibold text-gray-900">{averageComplexity}%</span>
+                  <span className="font-semibold text-white">{averageComplexity}%</span>
                 </div>
-                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
                   <div className={`h-full ${getBarTone(averageComplexity)} rounded-full`} style={{ width: `${averageComplexity}%` }} />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{getComplexityLabel(averageComplexity)}</p>
+                <p className="text-xs text-gray-400 mt-1">{getComplexityLabel(averageComplexity)}</p>
               </div>
               <div>
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
                   <span>Time Pressure</span>
-                  <span className="font-semibold text-gray-900">{averageTimePressure}%</span>
+                  <span className="font-semibold text-white">{averageTimePressure}%</span>
                 </div>
-                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
                   <div className={`h-full ${getBarTone(averageTimePressure)} rounded-full`} style={{ width: `${averageTimePressure}%` }} />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">Blends deadlines + priority urgency</p>
+                <p className="text-xs text-gray-400 mt-1">Blends deadlines + priority urgency</p>
               </div>
             </div>
           </motion.div>
@@ -782,7 +783,7 @@ export default function DashboardPage() {
 
           {expandedSections.overview && (
             <div className="mt-6 space-y-6">
-              <p className="text-lg text-gray-700 leading-relaxed">{missionPlan.overview}</p>
+              <p className="text-lg text-gray-900 leading-relaxed">{missionPlan.overview}</p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 bg-white rounded-lg border border-gray-200">
                   <p className="text-xs uppercase font-semibold text-gray-500 mb-1">Primary Goal</p>
@@ -826,27 +827,27 @@ export default function DashboardPage() {
             </button>
           </div>
           {expandedSections.context && (
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-700">
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-900">
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="font-semibold text-gray-900">Discharge Type</p>
-                <p className="text-gray-600 mt-1">{data.dischargeType ? data.dischargeType : 'Not provided'}</p>
+                <p className="text-gray-800 mt-1">{data.dischargeType ? data.dischargeType : 'Not provided'}</p>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="font-semibold text-gray-900">Time in Service</p>
-                <p className="text-gray-600 mt-1">{data.timeInService ? `${data.timeInService} years` : 'Not provided'}</p>
+                <p className="text-gray-800 mt-1">{data.timeInService ? `${data.timeInService} years` : 'Not provided'}</p>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="font-semibold text-gray-900">Discharge Rank</p>
-                <p className="text-gray-600 mt-1">{data.dischargeRank || 'Not provided'}</p>
+                <p className="text-gray-800 mt-1">{data.dischargeRank || 'Not provided'}</p>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="font-semibold text-gray-900">Benefits markers</p>
-                <p className="text-gray-600 mt-1">Disability claim: {data.disabilityClaim === false ? 'Not filed' : 'Filed/unknown'}</p>
-                <p className="text-gray-600">GI Bill: {data.giBill === false ? 'Not activated' : 'Active/unknown'}</p>
+                <p className="text-gray-800 mt-1">Disability claim: {data.disabilityClaim === false ? 'Not filed' : 'Filed/unknown'}</p>
+                <p className="text-gray-800">GI Bill: {data.giBill === false ? 'Not activated' : 'Active/unknown'}</p>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="font-semibold text-gray-900">Awards noted</p>
-                <p className="text-gray-600 mt-1">{data.awards && data.awards.length > 0 ? data.awards.join(', ') : 'None captured yet'}</p>
+                <p className="text-gray-800 mt-1">{data.awards && data.awards.length > 0 ? data.awards.join(', ') : 'None captured yet'}</p>
               </div>
             </div>
           )}
@@ -907,16 +908,16 @@ export default function DashboardPage() {
           </motion.div>
 
           {/* Filter Bar */}
-          <div className="flex gap-3 flex-wrap">
+          <div className="flex gap-2 flex-wrap">
             {(['all', 'high', 'medium', 'low'] as const).map((priority) => (
               <button
                 key={priority}
                 onClick={() => setFilter(priority)}
                 className={`
-                  px-6 py-2 font-medium rounded-lg transition-colors
+                  px-6 py-2 font-bold uppercase text-xs tracking-wider rounded-full transition-colors
                   ${filter === priority 
                     ? 'bg-black text-white' 
-                    : 'border-2 border-gray-200 hover:border-gray-400'
+                    : 'border-2 border-gray-300 hover:border-black'
                   }
                 `}
               >
@@ -960,218 +961,117 @@ export default function DashboardPage() {
 
         {/* Task List */}
         <div className="space-y-4">
-          {filteredTasks.map((task, index) => (
-            <motion.div
-              key={task.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 + index * 0.05 }}
-              className={`
-                p-6 border-2 rounded-lg transition-all cursor-pointer
-                ${task.completed 
-                  ? 'border-gray-200 bg-gray-50 opacity-60' 
-                  : task.deadline && new Date(task.deadline) < new Date()
-                    ? 'border-red-300 bg-red-50 hover:border-red-400'
-                    : 'border-gray-200 hover:border-black'
-                }
-              `}
-            >
-              <div className="flex items-start gap-4" onClick={() => toggleTask(task.id)}>
-                <div className="flex-shrink-0 mt-1">
+          {filteredTasks.map((task, index) => {
+            const timeline = getTimelineMeta(task);
+            const isOverdue = task.deadline && new Date(task.deadline) < new Date() && !task.completed;
+            const stepsTotal = task.steps?.length || 0;
+            const stepsDone = task.stepsCompleted?.length || 0;
+            const taskProgress = stepsTotal > 0 ? Math.round((stepsDone / stepsTotal) * 100) : task.completed ? 100 : 0;
+            const priorityTone = task.priority === 'high'
+              ? 'bg-red-600 text-white'
+              : task.priority === 'medium'
+                ? 'bg-amber-500 text-white'
+                : 'bg-blue-600 text-white';
+
+            return (
+              <motion.div
+                key={task.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + index * 0.05 }}
+                className={`border-2 rounded-2xl p-6 hover:shadow-xl transition-shadow cursor-pointer ${
+                  isOverdue ? 'border-red-600' : 'border-black'
+                } ${task.completed ? 'opacity-60' : ''}`}
+                onClick={() => toggleTask(task.id)}
+              >
+                <div className="flex justify-between items-start mb-4">
                   <div
-                    className={`
-                      w-6 h-6 rounded border-2 flex items-center justify-center transition-colors
-                      ${task.completed 
-                        ? 'bg-black border-black' 
-                        : 'border-gray-300 hover:border-black'
-                      }
-                    `}
+                    className="flex items-center gap-3 min-w-0"
+                    onClick={(e) => { e.stopPropagation(); setSelectedTask(task); }}
                   >
-                    {task.completed && (
-                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
+                    <input
+                      type="checkbox"
+                      checked={task.completed}
+                      onChange={() => toggleTask(task.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-6 h-6 rounded border-2 border-black accent-black"
+                    />
+                    <h3 className={`text-lg font-black uppercase tracking-tight truncate ${task.completed ? 'line-through' : ''}`}>
+                      {task.title}
+                    </h3>
                   </div>
+                  <span className={`px-3 py-1 text-xs font-bold uppercase rounded-full ${priorityTone}`}>
+                    {task.priority}
+                  </span>
                 </div>
 
-                <div className="flex-1 min-w-0" onClick={(e) => { e.stopPropagation(); setSelectedTask(task); }}>
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div className="flex-1">
-                      <h3 className={`text-lg font-medium ${task.completed ? 'line-through' : ''}`}>
-                        {task.title}
-                      </h3>
-                      {/* Core Task Badge */}
-                      {task.core && (
-                        <span className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-full mt-1 font-medium">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          Required For All Veterans
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 flex-shrink-0 flex-wrap justify-end">
-                      {/* Overdue Badge */}
-                      {task.deadline && new Date(task.deadline) < new Date() && !task.completed && (
-                        <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded border bg-red-50 text-red-700 border-red-300">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                          </svg>
-                          Overdue
-                        </span>
-                      )}
-                      <span className={`px-3 py-1 text-xs font-medium rounded border ${getPriorityColor(task.priority)}`}>
-                        {task.priority.toUpperCase()}
-                      </span>
-                      <span className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded border bg-gray-100 text-gray-700 border-gray-200">
-                        {(() => {
-                          const { icon: Icon, color } = getCategoryIcon(task.category as TaskCategory);
-                          return <Icon className={`${color} text-sm`} />;
-                        })()}
-                        {getCategoryLabel(task.category)}
-                      </span>
-                    </div>
-                  </div>
+                <p className="text-gray-600 mb-4 line-clamp-2">{task.description}</p>
 
-                  <p className="text-gray-600 mb-3">{task.description}</p>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                    {(() => {
-                      const complexityScore = getComplexityScore(task);
-                      const timeline = getTimelineMeta(task);
-                      return (
-                        <>
-                          <div>
-                            <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                              <span>Complexity</span>
-                              <span className="font-semibold text-gray-900">{complexityScore}%</span>
-                            </div>
-                            <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full ${getBarTone(complexityScore)} rounded-full`}
-                                style={{ width: `${complexityScore}%` }}
-                              />
-                            </div>
-                            <p className="text-[11px] text-gray-500 mt-1">{getComplexityLabel(complexityScore)}</p>
-                          </div>
-                          <div>
-                            <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                              <span className="flex items-center gap-1">
-                                <Clock size={12} /> Time
-                              </span>
-                              <span className="font-semibold text-gray-900">{timeline.score}%</span>
-                            </div>
-                            <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full ${getBarTone(timeline.score)} rounded-full`}
-                                style={{ width: `${timeline.score}%` }}
-                              />
-                            </div>
-                            <p className="text-[11px] text-gray-500 mt-1">{timeline.label}</p>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
-
-                  {/* Step Progress Indicator */}
-                  {task.steps && task.steps.length > 0 && (
-                    <div className="mb-3">
-                      <div className="flex items-center gap-2 text-sm mb-2">
-                        <span className={`font-medium ${
-                          !task.completed && (task.stepsCompleted?.length || 0) < task.steps.length
-                            ? 'text-orange-600'
-                            : 'text-gray-600'
-                        }`}>
-                          {task.stepsCompleted?.length || 0}/{task.steps.length} steps completed
-                        </span>
-                        {!task.completed && (task.stepsCompleted?.length || 0) < task.steps.length && (
-                          <span className="text-xs text-orange-600 font-medium">
-                            (Complete all steps to finish task)
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex gap-1">
-                        {task.steps.map((_, index) => (
-                          <div
-                            key={index}
-                            className={`h-2 flex-1 rounded-full transition-colors ${
-                              task.stepsCompleted?.includes(index)
-                                ? 'bg-green-500'
-                                : 'bg-gray-200'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {task.deadline && (
-                    <p className="text-sm text-gray-500 mb-3">
-                      <span className="font-medium">Deadline:</span> {formatDate(task.deadline)}
-                    </p>
-                  )}
-
-                  {/* "View Steps" button - shows only if task has steps */}
-                  {task.steps && task.steps.length > 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setExpandedStepsTaskId(expandedStepsTaskId === task.id ? null : task.id);
-                      }}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
-                    >
-                      {expandedStepsTaskId === task.id ? '▼ Hide Steps' : '▶ View Steps'}
-                    </button>
-                  )}
-
-                  {/* Expanded steps section - shows when task is expanded */}
-                  {expandedStepsTaskId === task.id && task.steps && task.steps.length > 0 && (
-                    <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
-                      <h4 className="font-semibold text-gray-800 mb-3">How to complete this task:</h4>
-                      <ol className="space-y-3">
-                        {task.steps.map((step, stepIndex) => (
-                          <li 
-                            key={stepIndex} 
-                            className="flex gap-3 cursor-pointer hover:bg-blue-100 p-2 rounded transition-colors"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              useOnboardingStore.getState().toggleStepCompletion(task.id, stepIndex);
-                            }}
-                          >
-                            <div className="flex-shrink-0 mt-0.5">
-                              <div
-                                className={`
-                                  w-5 h-5 rounded border-2 flex items-center justify-center transition-colors
-                                  ${task.stepsCompleted?.includes(stepIndex)
-                                    ? 'bg-green-500 border-green-500'
-                                    : 'border-gray-400 group-hover:border-green-500'
-                                  }
-                                `}
-                              >
-                                {task.stepsCompleted?.includes(stepIndex) && (
-                                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex-1">
-                              <span className="font-medium text-blue-700 mr-2">{stepIndex + 1}.</span>
-                              <span className={`text-gray-700 ${task.stepsCompleted?.includes(stepIndex) ? 'line-through opacity-60' : ''}`}>
-                                {step}
-                              </span>
-                            </div>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
+                <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-gray-500">
+                  <span>{task.deadline ? `Deadline: ${formatDate(task.deadline)}` : 'No deadline set'}</span>
+                  <span className={isOverdue ? 'text-red-600' : 'text-gray-700'}>{timeline.label}</span>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+
+                <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-black" style={{ width: `${taskProgress}%` }} />
+                </div>
+
+                {task.steps && task.steps.length > 0 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpandedStepsTaskId(expandedStepsTaskId === task.id ? null : task.id);
+                    }}
+                    className="mt-4 text-xs font-bold uppercase tracking-wider text-gray-600 hover:text-black transition-colors"
+                  >
+                    {expandedStepsTaskId === task.id ? 'Hide Steps' : 'View Steps'}
+                  </button>
+                )}
+
+                {expandedStepsTaskId === task.id && task.steps && task.steps.length > 0 && (
+                  <div className="mt-4 p-4 bg-gray-50 border-2 border-black/10 rounded-xl">
+                    <h4 className="font-bold text-gray-900 mb-3 uppercase text-xs tracking-widest">Steps</h4>
+                    <ol className="space-y-3">
+                      {task.steps.map((step, stepIndex) => (
+                        <li 
+                          key={stepIndex} 
+                          className="flex gap-3 cursor-pointer hover:bg-white p-2 rounded transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            useOnboardingStore.getState().toggleStepCompletion(task.id, stepIndex);
+                          }}
+                        >
+                          <div className="flex-shrink-0 mt-0.5">
+                            <div
+                              className={`
+                                w-5 h-5 rounded border-2 flex items-center justify-center transition-colors
+                                ${task.stepsCompleted?.includes(stepIndex)
+                                  ? 'bg-black border-black'
+                                  : 'border-gray-400'
+                                }
+                              `}
+                            >
+                              {task.stepsCompleted?.includes(stepIndex) && (
+                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <span className="font-bold text-gray-500 mr-2">{stepIndex + 1}.</span>
+                            <span className={`text-gray-700 ${task.stepsCompleted?.includes(stepIndex) ? 'line-through opacity-60' : ''}`}>
+                              {step}
+                            </span>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
 
         {filteredTasks.length === 0 && (

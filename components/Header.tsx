@@ -3,13 +3,36 @@
 import { useRouter } from 'next/navigation';
 import { useOnboardingStore } from '@/lib/useOnboardingStore';
 import { Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BranchSwitcher from './BranchSwitcher';
 
 export function Header() {
   const router = useRouter();
   const { reset, missionPlan } = useOnboardingStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Nike-style scroll detection - manipulates DOM classes directly
+  useEffect(() => {
+    const handleScroll = () => {
+      const header = document.getElementById('header');
+      if (!header) return;
+
+      if (window.scrollY > 100) {
+        // Scrolled past hero - solid white header
+        header.classList.add('scrolled');
+        header.classList.remove('dark-mode');
+      } else {
+        // On hero - transparent with white text
+        header.classList.remove('scrolled');
+        header.classList.add('dark-mode');
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    // Set initial state on mount
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleReset = () => {
     if (confirm('Are you sure? This will clear your mission plan and return to onboarding.')) {
@@ -20,53 +43,67 @@ export function Header() {
   };
 
   return (
-    <header className="site-header border-b-2 border-gray-200 bg-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4 md:gap-8 flex-1">
-          <button
-            onClick={() => router.push('/')}
-            className="text-xl md:text-2xl font-bold tracking-tight hover:opacity-70 transition-opacity whitespace-nowrap"
-          >
-            Cadence
-          </button>
-          {missionPlan && (
-            <nav className="hidden md:flex gap-4 lg:gap-6">
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap"
-              >
-                Dashboard
-              </button>
-                <button
-                  onClick={() => router.push('/benefits-scanner')}
-                  className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap"
-                >
-                  Benefits
-                </button>
-                <button
-                  onClick={() => router.push('/housing-finder')}
-                  className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap"
-                >
-                  Housing
-                </button>
-              <button
-                onClick={() => router.push('/mos-translator')}
-                className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap"
-              >
-                MOS
-              </button>
-            </nav>
-          )}
-        </div>
+    <header 
+      className="site-header transition-all duration-500 dark-mode"
+      id="header"
+    >
+      <div className="container-full flex justify-between items-center py-4 px-6">
+        <button
+          onClick={() => router.push('/')}
+          className="text-2xl font-black uppercase tracking-tighter hover:opacity-70 transition-opacity whitespace-nowrap"
+        >
+          Cadence
+        </button>
+        
+        {/* Navigation - always visible */}
+        <nav className="hidden md:flex gap-12 absolute left-1/2 transform -translate-x-1/2">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="nav-link"
+            >
+              Mission Plans
+            </button>
+            <button
+              onClick={() => router.push('/benefits-scanner')}
+              className="nav-link"
+            >
+              Benefits
+            </button>
+            <button
+              onClick={() => router.push('/housing-finder')}
+              className="nav-link"
+            >
+              Housing
+            </button>
+            <button
+              onClick={() => router.push('/support-groups')}
+              className="nav-link"
+            >
+              Support
+            </button>
+            <button
+              onClick={() => router.push('/mos-translator')}
+              className="nav-link"
+            >
+              MOS
+            </button>
+        </nav>
 
-        <div className="hidden md:flex items-center gap-2 lg:gap-4">
+        <div className="flex items-center gap-4">
           <BranchSwitcher />
-          {missionPlan && (
+          {missionPlan ? (
             <button
               onClick={handleReset}
-              className="px-3 lg:px-4 py-2 text-xs lg:text-sm font-medium border-2 border-gray-200 rounded-lg hover:border-black transition-colors whitespace-nowrap"
+              className="btn-nike btn-nike-primary text-xs py-2 px-6 hidden md:inline-flex"
             >
-              New Plan
+              Reset
+            </button>
+          ) : (
+            <button
+              onClick={() => router.push('/onboarding')}
+              className="btn-nike btn-nike-primary text-xs py-2 px-6 hidden md:inline-flex"
+            >
+              Get Started
             </button>
           )}
         </div>
@@ -93,7 +130,7 @@ export function Header() {
                     router.push('/dashboard');
                     setIsMenuOpen(false);
                   }}
-                  className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-black transition-colors rounded"
+                  className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-black transition-colors rounded-none"
                 >
                   Dashboard
                 </button>
@@ -102,7 +139,7 @@ export function Header() {
                     router.push('/benefits-scanner');
                     setIsMenuOpen(false);
                   }}
-                  className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-black transition-colors rounded"
+                  className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-black transition-colors rounded-none"
                 >
                   Benefits Scanner
                 </button>
@@ -111,7 +148,7 @@ export function Header() {
                       router.push('/housing-finder');
                       setIsMenuOpen(false);
                     }}
-                    className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-black transition-colors rounded"
+                    className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-black transition-colors rounded-none"
                   >
                     Housing Finder
                   </button>
@@ -120,14 +157,23 @@ export function Header() {
                     router.push('/mos-translator');
                     setIsMenuOpen(false);
                   }}
-                  className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-black transition-colors rounded"
+                  className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-black transition-colors rounded-none"
                 >
                   MOS Translator
+                </button>
+                <button
+                  onClick={() => {
+                    router.push('/support-groups');
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-black transition-colors rounded-none"
+                >
+                  Support Groups
                 </button>
                 <hr className="my-2" />
                 <button
                   onClick={handleReset}
-                  className="block w-full text-left px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors rounded border-2 border-red-200"
+                  className="block w-full text-left px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors rounded-none border-2 border-red-200"
                 >
                   New Plan
                 </button>
