@@ -225,24 +225,11 @@ export default function DashboardPage() {
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
-            className="mb-6 p-6 bg-black text-white rounded-2xl"
-
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    const labels: Record<string, string> = {
-                <h2 className="text-sm font-bold uppercase tracking-wide mb-1">NCO Guidance: VA Healthcare</h2>
-                <p className="text-sm text-gray-400 mb-2">
-      career: 'Career',
-      education: 'Education',
-      housing: 'Housing',
-                  <a href="https://www.va.gov/health-care/how-to-apply/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">Apply on VA.gov</a>
-                  <a href="https://www.va.gov/find-locations/" target="_blank" rel="noreferrer" className="text-xs px-4 py-2 bg-white text-black font-bold uppercase rounded-full hover:scale-105 transition-transform">Find VA Facility</a>
-    };
-                <p className="text-xs text-gray-400 mt-3">Cadence provides guidance, not legal advice.</p>
   };
 
   const getComplexityLabel = (score: number) => {
     if (score >= 75) return 'Heavy lift';
-                  className="px-4 py-2 bg-white text-black font-bold uppercase text-xs rounded-full hover:scale-105 transition-transform"
+    if (score >= 45) return 'Moderate effort';
     return 'Quick win';
   };
 
