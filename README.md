@@ -68,9 +68,7 @@ A production-grade web application helping veterans transition to civilian life 
     page.tsx
   /housing-finder          # Veteran-friendly housing search
     page.tsx
-  /mos-scanner             # Military job to civilian equivalent
-    page.tsx
-  /mos-translator          # MOS translation with salary data
+  /mos-translator          # MOS career explorer with salary, certs, resume bullets
     page.tsx
   /api
     /guide                 # POST: AI mission plan generation

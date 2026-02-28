@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Army Gold Circle Background -->
+  <circle cx="100" cy="100" r="95" fill="#B4A582" stroke="#333" stroke-width="2"/>
+  
+  <!-- Inner Gold Circle -->
+  <circle cx="100" cy="100" r="85" fill="#D4C5B0"/>
+  
+  <!-- Army Star (Official symbol) -->
+  <g transform="translate(100, 100)">
+    <!-- Outer star points -->
+    <path d="M 0,-60 L 14.7,-18.5 L 58.8,-18.5 L 25.1,10.5 L 39.8,52 L 0,23 L -39.8,52 L -25.1,10.5 L -58.8,-18.5 L -14.7,-18.5 Z" 
+          fill="#333" stroke="#D4C5B0" stroke-width="1"/>
+    
+    <!-- Inner star (gold) -->
+    <path d="M 0,-48 L 11.8,-14.8 L 47,-14.8 L 20.1,8.4 L 31.8,41.6 L 0,18.4 L -31.8,41.6 L -20.1,8.4 L -47,-14.8 L -11.8,-14.8 Z" 
+          fill="#D4C5B0"/>
+  </g>
+  
+  <!-- Army Text -->
+  <text x="100" y="175" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">U.S. ARMY</text>
+</svg>

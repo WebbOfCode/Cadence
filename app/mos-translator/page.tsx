@@ -27,6 +27,7 @@ export default function MOSTranslatorPage() {
   const [zipCode, setZipCode] = useState<string>("");
   const [mosInfo, setMosInfo] = useState<MOSInfo | null>(null);
   const [usePreset, setUsePreset] = useState(!!preset.mos && !!preset.location);
+  const [showForm, setShowForm] = useState(!preset.mos || !preset.location);
   
   const [results, setResults] = useState<null | {
     jobTitles: string[];
@@ -34,6 +35,7 @@ export default function MOSTranslatorPage() {
     skillGaps: string[];
     certPaths: { name: string; timeWeeks: number; costUSD: number; provider: string }[];
     resumeBullets: string[];
+    onetLinks?: { code: string; title: string; url: string }[];
   }>(null);
 
   const {
@@ -49,12 +51,12 @@ export default function MOSTranslatorPage() {
     },
   });
 
-  // Auto-run with preset data
+  // Auto-run with preset data only once
   useEffect(() => {
-    if (usePreset && preset.mos && preset.location) {
+    if (usePreset && preset.mos && preset.location && !results) {
       onSubmit({ mos: preset.mos, zip: preset.location });
     }
-  }, [usePreset]);
+  }, [usePreset, preset.mos, preset.location]);
 
   async function onSubmit(values: TranslatorInputs) {
     setLoading(true);
@@ -103,7 +105,7 @@ export default function MOSTranslatorPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8 flex-1 w-full">
       <h1 className="text-xl md:text-2xl font-bold">MOS Career Explorer</h1>
       <p className="text-xs md:text-sm text-gray-600 mt-1">Discover career paths, salaries, certifications, and resume bullets for your MOS</p>
       
@@ -129,7 +131,11 @@ export default function MOSTranslatorPage() {
             <button
               onClick={() => {
                 setUsePreset(true);
+                setShowForm(false);
                 setResults(null);
+                if (preset.mos && preset.location) {
+                  onSubmit({ mos: preset.mos, zip: preset.location });
+                }
               }}
               className="flex-1 px-3 py-2 text-xs md:text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
@@ -138,6 +144,7 @@ export default function MOSTranslatorPage() {
             <button
               onClick={() => {
                 setUsePreset(false);
+                setShowForm(true);
                 reset();
                 setResults(null);
               }}
@@ -149,7 +156,7 @@ export default function MOSTranslatorPage() {
         </div>
       )}
 
-      {!usePreset && (
+      {(showForm || !usePreset) && (
         <form onSubmit={handleSubmit(handleSubmitForm)} className="mt-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -280,6 +287,36 @@ export default function MOSTranslatorPage() {
                 ))}
               </ul>
             </section>
+
+            {/* O*NET Online Resources */}
+            {results.onetLinks && results.onetLinks.length > 0 && (
+              <section className="p-3 md:p-4 border-2 border-blue-200 rounded-lg bg-blue-50 md:col-span-2 lg:col-span-2">
+                <h2 className="text-sm md:text-base font-semibold flex items-center gap-2">
+                  <span>🔗</span> O*NET Career Explorer
+                </h2>
+                <p className="text-xs text-gray-600 mb-3">Official occupation data from the Department of Labor</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {results.onetLinks.map((link) => (
+                    <a
+                      key={link.code}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between p-2 border border-blue-300 rounded-md bg-white hover:bg-blue-100 transition-colors text-xs md:text-sm"
+                    >
+                      <div>
+                        <p className="font-medium text-blue-900">{link.title}</p>
+                        <p className="text-blue-600 text-xs">SOC: {link.code}</p>
+                      </div>
+                      <span className="text-blue-600">→</span>
+                    </a>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Powered by <a href="https://www.onetonline.org/" target="_blank" rel="noopener noreferrer" className="underline text-blue-600 hover:text-blue-800">O*NET OnLine</a>
+                </p>
+              </section>
+            )}
 
             {/* One-click resume bullets */}
             <section className="p-3 md:p-4 border-2 border-gray-200 rounded-lg md:col-span-2 lg:col-span-2">

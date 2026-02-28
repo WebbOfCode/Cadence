@@ -9,7 +9,35 @@ import { formatDate, getDaysUntilETS, getGoalLabel } from '@/lib/utils';
 import type { MissionTask } from '@/lib/types';
 import { TaskDetailDrawer } from './components/TaskDetailDrawer';
 import { EditGoalsModal } from './components/EditGoalsModal';
+import { TransitionIntelCard } from './components/TransitionIntelCard';
 import { getCategoryIcon, type TaskCategory } from '@/lib/categoryIcons';
+
+type TaskPhase = 'pre-separation' | 'transition' | 'post-separation';
+
+const phaseMeta: Record<TaskPhase, { label: string; description: string }> = {
+  'pre-separation': {
+    label: 'Pre-separation (180+ days)',
+    description: 'Build momentum early and finish foundational admin and healthcare work.',
+  },
+  transition: {
+    label: 'Transition (last 90 days)',
+    description: 'Focus on near-term deadlines that directly impact separation readiness.',
+  },
+  'post-separation': {
+    label: 'Post-separation (first year)',
+    description: 'Stabilize civilian life and complete long-tail benefits and career tasks.',
+  },
+};
+
+const categoryLabels: Record<MissionTask['category'], string> = {
+  admin: 'Admin',
+  healthcare: 'Healthcare',
+  career: 'Career',
+  education: 'Education',
+  housing: 'Housing',
+  finance: 'Finance',
+  wellness: 'Wellness',
+};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -239,6 +267,55 @@ export default function DashboardPage() {
     return 'bg-emerald-500';
   };
 
+  const getTaskPhase = (task: MissionTask, etsDate: Date | null): TaskPhase => {
+    if (!etsDate) {
+      return daysUntilETS < 0 ? 'post-separation' : daysUntilETS <= 90 ? 'transition' : 'pre-separation';
+    }
+
+    if (!task.deadline) {
+      if (daysUntilETS < 0) return 'post-separation';
+      if (daysUntilETS <= 90) return 'transition';
+      return 'pre-separation';
+    }
+
+    const deadline = new Date(task.deadline);
+    const isBeforeOrOnETS = deadline <= etsDate;
+
+    if (isBeforeOrOnETS) {
+      const daysBeforeSeparation = Math.max(0, daysBetween(etsDate, deadline));
+      if (daysBeforeSeparation <= 90) {
+        return 'transition';
+      }
+      return 'pre-separation';
+    }
+
+    const daysAfterSeparation = daysBetween(deadline, etsDate);
+    if (daysAfterSeparation <= 365) {
+      return 'post-separation';
+    }
+
+    return 'post-separation';
+  };
+
+  const getUrgencyLabel = (task: MissionTask, etsDate: Date | null) => {
+    if (task.completed) return null;
+
+    if (task.deadline) {
+      const daysLeft = daysBetween(new Date(task.deadline), new Date());
+      if (daysLeft <= 0) return 'Overdue — action needed now';
+      if (daysLeft <= 21) return `${daysLeft} days left — time-sensitive`;
+    }
+
+    if (etsDate) {
+      const beforeSeparation = !task.deadline || new Date(task.deadline) <= etsDate;
+      if (beforeSeparation && task.priority === 'high') {
+        return 'Must be done before separation date';
+      }
+    }
+
+    return null;
+  };
+
   const formatRelativeTime = (date: Date) => {
     const diffMs = Date.now() - date.getTime();
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
@@ -269,6 +346,7 @@ export default function DashboardPage() {
 
   const tasks = missionPlan?.tasks ?? [];
   const daysUntilETS = data.etsDate ? getDaysUntilETS(data.etsDate) : 0;
+  const etsDate = data.etsDate ? new Date(data.etsDate) : null;
   const completedCount = tasks.filter((t) => t.completed).length;
   const progressPercent = tasks.length ? (completedCount / tasks.length) * 100 : 0;
   
@@ -428,6 +506,30 @@ export default function DashboardPage() {
       t.category.toLowerCase().includes(query)
     );
   }
+
+  const phaseSections: Record<TaskPhase, MissionTask[]> = {
+    'pre-separation': [],
+    transition: [],
+    'post-separation': [],
+  };
+
+  filteredTasks.forEach((task) => {
+    const phase = getTaskPhase(task, etsDate);
+    phaseSections[phase].push(task);
+  });
+
+  const categoryProgress = (Object.keys(categoryLabels) as MissionTask['category'][]).map((category) => {
+    const categoryTasks = tasks.filter((task) => task.category === category);
+    const done = categoryTasks.filter((task) => task.completed).length;
+    const percent = categoryTasks.length ? Math.round((done / categoryTasks.length) * 100) : 0;
+    return {
+      category,
+      label: categoryLabels[category],
+      done,
+      total: categoryTasks.length,
+      percent,
+    };
+  }).filter((entry) => entry.total > 0);
 
   const lastSavedAt = data.lastSavedAt ? new Date(data.lastSavedAt) : null;
 
@@ -668,15 +770,16 @@ export default function DashboardPage() {
           </motion.div>
         )}
 
-        {/* Priority Breakdown */}
+        {/* Transition Focus */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className="mb-8 p-6 bg-gradient-to-r from-gray-50 to-white border-2 border-gray-200 rounded-lg"
         >
-          <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-4">Priority Status</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
+          <h2 className="text-sm font-bold uppercase tracking-wide text-gray-500 mb-2">Progress Psychology</h2>
+          <p className="text-sm text-gray-600 mb-4">Smaller wins by category help avoid task paralysis while keeping momentum.</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 mb-5">
             <div>
               <p className="text-xs text-gray-600 mb-1">High Priority</p>
               <p className="text-2xl font-bold">{highPriorityCompleted}/{highPriorityTasks.length}</p>
@@ -689,6 +792,21 @@ export default function DashboardPage() {
               <p className="text-xs text-gray-600 mb-1">Overall Progress</p>
               <p className="text-2xl font-bold">{Math.round(progressPercent)}%</p>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            {categoryProgress.map((entry) => (
+              <div key={entry.category} className="p-3 rounded-lg border border-gray-200 bg-white">
+                <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+                  <span>{entry.label}</span>
+                  <span>{entry.done}/{entry.total}</span>
+                </div>
+                <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-black rounded-full" style={{ width: `${entry.percent}%` }} />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">{entry.percent}% complete</p>
+              </div>
+            ))}
           </div>
         </motion.div>
 
@@ -773,6 +891,31 @@ export default function DashboardPage() {
             </div>
           </motion.div>
         </div>
+
+        {/* Transition Intel Card - AI-Powered Guidance */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="mb-10"
+        >
+          <TransitionIntelCard
+            profile={{
+              branch: data.branch,
+              mos: data.mos,
+              location: data.location,
+              separationDate: data.etsDate,
+            }}
+            dashboard={{
+              completedTasks: missionPlan?.tasks
+                .filter((t) => t.completed)
+                .map((t) => t.id) || [],
+              currentGoals: data.goal ? [data.goal] : [],
+              blockers: data.goalDetails ? [data.goalDetails] : [],
+            }}
+            context={`Veteran is ${daysUntilETS} days from ETS. Primary goal: ${data.goal}. ${missionPlan?.tasks.length || 0} tasks in mission plan.`}
+          />
+        </motion.div>
 
         {/* Overview */}
         <motion.div
@@ -876,20 +1019,13 @@ export default function DashboardPage() {
           className="mb-12 p-6 border-2 border-gray-200 rounded-lg"
         >
           <h2 className="text-lg font-bold mb-4">Quick Access Tools</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button
-              onClick={() => router.push('/mos-scanner')}
-              className="p-4 border-2 border-gray-200 rounded-lg hover:border-black transition-all text-left"
-            >
-              <h3 className="font-semibold mb-1">MOS Career Scanner</h3>
-              <p className="text-sm text-gray-600">Get personalized civilian career pathways based on your MOS and location</p>
-            </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
               onClick={() => router.push('/mos-translator')}
               className="p-4 border-2 border-gray-200 rounded-lg hover:border-black transition-all text-left"
             >
-              <h3 className="font-semibold mb-1">MOS Translator</h3>
-              <p className="text-sm text-gray-600">Translate your MOS to civilian job titles with salary insights</p>
+              <h3 className="font-semibold mb-1">MOS Career Explorer</h3>
+              <p className="text-sm text-gray-600">Translate your MOS to civilian careers with salary data, skill gaps, certifications, and resume bullets</p>
             </button>
             <button
               onClick={() => router.push('/benefits-scanner')}
@@ -974,117 +1110,169 @@ export default function DashboardPage() {
           </motion.div>
         )}
 
-        {/* Task List */}
-        <div className="space-y-4">
-          {filteredTasks.map((task, index) => {
-            const timeline = getTimelineMeta(task);
-            const isOverdue = task.deadline && new Date(task.deadline) < new Date() && !task.completed;
-            const stepsTotal = task.steps?.length || 0;
-            const stepsDone = task.stepsCompleted?.length || 0;
-            const taskProgress = stepsTotal > 0 ? Math.round((stepsDone / stepsTotal) * 100) : task.completed ? 100 : 0;
-            const priorityTone = task.priority === 'high'
-              ? 'bg-red-600 text-white'
-              : task.priority === 'medium'
-                ? 'bg-amber-500 text-white'
-                : 'bg-blue-600 text-white';
+        {/* Task List by Phase */}
+        <div className="space-y-8">
+          {(['pre-separation', 'transition', 'post-separation'] as TaskPhase[]).map((phase, phaseIndex) => {
+            const phaseTasks = phaseSections[phase];
+            const phaseCompleted = phaseTasks.filter((task) => task.completed).length;
+            const phasePercent = phaseTasks.length ? Math.round((phaseCompleted / phaseTasks.length) * 100) : 0;
+
+            if (phaseTasks.length === 0) return null;
 
             return (
-              <motion.div
-                key={task.id}
+              <motion.section
+                key={phase}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + index * 0.05 }}
-                className={`border-2 rounded-2xl p-6 hover:shadow-xl transition-shadow cursor-pointer ${
-                  isOverdue ? 'border-red-600' : 'border-black'
-                } ${task.completed ? 'opacity-60' : ''}`}
-                onClick={() => toggleTask(task.id)}
+                transition={{ delay: 0.5 + phaseIndex * 0.06 }}
+                className="border-2 border-gray-200 rounded-2xl p-5 md:p-6 bg-white"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div
-                    className="flex items-center gap-3 min-w-0"
-                    onClick={(e) => { e.stopPropagation(); setSelectedTask(task); }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={task.completed}
-                      onChange={() => toggleTask(task.id)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-6 h-6 rounded border-2 border-black accent-black"
-                    />
-                    <h3 className={`text-lg font-black uppercase tracking-tight truncate ${task.completed ? 'line-through' : ''}`}>
-                      {task.title}
-                    </h3>
+                <div className="mb-5 pb-4 border-b border-gray-200">
+                  <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Task Phase</p>
+                      <h3 className="text-2xl font-black tracking-tight">{phaseMeta[phase].label}</h3>
+                      <p className="text-sm text-gray-600 mt-1">{phaseMeta[phase].description}</p>
+                    </div>
+                    <div className="min-w-[180px]">
+                      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                        <span>Phase Completion</span>
+                        <span>{phaseCompleted}/{phaseTasks.length}</span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-black rounded-full" style={{ width: `${phasePercent}%` }} />
+                      </div>
+                    </div>
                   </div>
-                  <span className={`px-3 py-1 text-xs font-bold uppercase rounded-full ${priorityTone}`}>
-                    {task.priority}
-                  </span>
                 </div>
 
-                <p className="text-gray-600 mb-4 line-clamp-2">{task.description}</p>
+                <div className="space-y-4">
+                  {phaseTasks.map((task) => {
+                    const timeline = getTimelineMeta(task);
+                    const isOverdue = task.deadline && new Date(task.deadline) < new Date() && !task.completed;
+                    const urgencyLabel = getUrgencyLabel(task, etsDate);
+                    const stepsTotal = task.steps?.length || 0;
+                    const stepsDone = task.stepsCompleted?.length || 0;
+                    const taskProgress = stepsTotal > 0 ? Math.round((stepsDone / stepsTotal) * 100) : task.completed ? 100 : 0;
+                    const priorityTone = task.priority === 'high'
+                      ? 'bg-red-600 text-white'
+                      : task.priority === 'medium'
+                        ? 'bg-amber-500 text-white'
+                        : 'bg-blue-600 text-white';
+                    const { icon: CategoryIcon, color } = getCategoryIcon(task.category as TaskCategory);
 
-                <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-gray-500">
-                  <span>{task.deadline ? `Deadline: ${formatDate(task.deadline)}` : 'No deadline set'}</span>
-                  <span className={isOverdue ? 'text-red-600' : 'text-gray-700'}>{timeline.label}</span>
-                </div>
-
-                <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-black" style={{ width: `${taskProgress}%` }} />
-                </div>
-
-                {task.steps && task.steps.length > 0 && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setExpandedStepsTaskId(expandedStepsTaskId === task.id ? null : task.id);
-                    }}
-                    className="mt-4 text-xs font-bold uppercase tracking-wider text-gray-600 hover:text-black transition-colors"
-                  >
-                    {expandedStepsTaskId === task.id ? 'Hide Steps' : 'View Steps'}
-                  </button>
-                )}
-
-                {expandedStepsTaskId === task.id && task.steps && task.steps.length > 0 && (
-                  <div className="mt-4 p-4 bg-gray-50 border-2 border-black/10 rounded-xl">
-                    <h4 className="font-bold text-gray-900 mb-3 uppercase text-xs tracking-widest">Steps</h4>
-                    <ol className="space-y-3">
-                      {task.steps.map((step, stepIndex) => (
-                        <li 
-                          key={stepIndex} 
-                          className="flex gap-3 cursor-pointer hover:bg-white p-2 rounded transition-colors"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            useOnboardingStore.getState().toggleStepCompletion(task.id, stepIndex);
-                          }}
-                        >
-                          <div className="flex-shrink-0 mt-0.5">
-                            <div
-                              className={`
-                                w-5 h-5 rounded border-2 flex items-center justify-center transition-colors
-                                ${task.stepsCompleted?.includes(stepIndex)
-                                  ? 'bg-black border-black'
-                                  : 'border-gray-400'
-                                }
-                              `}
-                            >
-                              {task.stepsCompleted?.includes(stepIndex) && (
-                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                </svg>
-                              )}
-                            </div>
+                    return (
+                      <motion.div
+                        key={task.id}
+                        initial={{ opacity: 0, y: 14 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`border-2 rounded-2xl p-6 hover:shadow-xl transition-shadow cursor-pointer ${
+                          isOverdue ? 'border-red-600' : 'border-black'
+                        } ${task.completed ? 'opacity-60' : ''}`}
+                        onClick={() => toggleTask(task.id)}
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <div
+                            className="flex items-center gap-3 min-w-0"
+                            onClick={(e) => { e.stopPropagation(); setSelectedTask(task); }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={task.completed}
+                              onChange={() => toggleTask(task.id)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="w-6 h-6 rounded border-2 border-black accent-black"
+                            />
+                            <h3 className={`text-lg font-black uppercase tracking-tight truncate ${task.completed ? 'line-through' : ''}`}>
+                              {task.title}
+                            </h3>
                           </div>
-                          <div className="flex-1">
-                            <span className="font-bold text-gray-500 mr-2">{stepIndex + 1}.</span>
-                            <span className={`text-gray-700 ${task.stepsCompleted?.includes(stepIndex) ? 'line-through opacity-60' : ''}`}>
-                              {step}
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-1 text-xs font-semibold rounded-full border border-gray-200 bg-white text-gray-700 flex items-center gap-1">
+                              <CategoryIcon size={14} />
+                              {categoryLabels[task.category]}
+                            </span>
+                            <span className={`px-3 py-1 text-xs font-bold uppercase rounded-full ${priorityTone}`}>
+                              {task.priority}
                             </span>
                           </div>
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                )}
-              </motion.div>
+                        </div>
+
+                        <p className="text-gray-600 mb-4 line-clamp-2">{task.description}</p>
+
+                        {urgencyLabel && (
+                          <div className="mb-3 px-3 py-2 rounded-lg border border-red-200 bg-red-50 text-red-700 text-xs font-semibold uppercase tracking-wide">
+                            Time-sensitive: {urgencyLabel}
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-gray-500">
+                          <span>{task.deadline ? `Deadline: ${formatDate(task.deadline)}` : 'No deadline set'}</span>
+                          <span className={isOverdue ? 'text-red-600' : 'text-gray-700'}>{timeline.label}</span>
+                        </div>
+
+                        <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="h-full bg-black" style={{ width: `${taskProgress}%` }} />
+                        </div>
+
+                        {task.steps && task.steps.length > 0 && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedStepsTaskId(expandedStepsTaskId === task.id ? null : task.id);
+                            }}
+                            className="mt-4 text-xs font-bold uppercase tracking-wider text-gray-600 hover:text-black transition-colors"
+                          >
+                            {expandedStepsTaskId === task.id ? 'Hide Steps' : 'View Steps'}
+                          </button>
+                        )}
+
+                        {expandedStepsTaskId === task.id && task.steps && task.steps.length > 0 && (
+                          <div className="mt-4 p-4 bg-gray-50 border-2 border-black/10 rounded-xl">
+                            <h4 className="font-bold text-gray-900 mb-3 uppercase text-xs tracking-widest">Steps</h4>
+                            <ol className="space-y-3">
+                              {task.steps.map((step, stepIndex) => (
+                                <li
+                                  key={stepIndex}
+                                  className="flex gap-3 cursor-pointer hover:bg-white p-2 rounded transition-colors"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    useOnboardingStore.getState().toggleStepCompletion(task.id, stepIndex);
+                                  }}
+                                >
+                                  <div className="flex-shrink-0 mt-0.5">
+                                    <div
+                                      className={`
+                                        w-5 h-5 rounded border-2 flex items-center justify-center transition-colors
+                                        ${task.stepsCompleted?.includes(stepIndex)
+                                          ? 'bg-black border-black'
+                                          : 'border-gray-400'
+                                        }
+                                      `}
+                                    >
+                                      {task.stepsCompleted?.includes(stepIndex) && (
+                                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex-1">
+                                    <span className="font-bold text-gray-500 mr-2">{stepIndex + 1}.</span>
+                                    <span className={`text-gray-700 ${task.stepsCompleted?.includes(stepIndex) ? 'line-through opacity-60' : ''}`}>
+                                      {step}
+                                    </span>
+                                  </div>
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.section>
             );
           })}
         </div>

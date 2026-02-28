@@ -1,11 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { OnboardingData, MissionPlan, MissionTask } from './types';
+import type { TransitionPlan } from './transition/schema';
 
 interface OnboardingStore {
   currentStep: number;
   data: Partial<OnboardingData>;
   missionPlan: MissionPlan | null;
+  transitionPlan: TransitionPlan | null;
+  transitionPlanGeneratedAt: number | null;
   
   setStep: (step: number) => void;
   nextStep: () => void;
@@ -13,6 +16,8 @@ interface OnboardingStore {
   
   updateData: (data: Partial<OnboardingData>) => void;
   setMissionPlan: (plan: MissionPlan) => void;
+  setTransitionPlan: (plan: TransitionPlan) => void;
+  clearTransitionPlanCache: () => void;
   addTask: (task: MissionTask) => void;
   updateTaskCompletion: (taskId: string, completed: boolean) => void;
   updateTask: (taskId: string, updates: Partial<MissionTask>) => void;
@@ -25,6 +30,8 @@ const initialState = {
   currentStep: 0,
   data: {},
   missionPlan: null,
+  transitionPlan: null,
+  transitionPlanGeneratedAt: null,
 };
 
 export const useOnboardingStore = create<OnboardingStore>()(
@@ -47,6 +54,16 @@ export const useOnboardingStore = create<OnboardingStore>()(
       })),
       
       setMissionPlan: (plan) => set({ missionPlan: plan }),
+      
+      setTransitionPlan: (plan) => set({ 
+        transitionPlan: plan, 
+        transitionPlanGeneratedAt: Date.now() 
+      }),
+      
+      clearTransitionPlanCache: () => set({
+        transitionPlan: null,
+        transitionPlanGeneratedAt: null,
+      }),
 
       addTask: (task) => set((state) => ({
         missionPlan: state.missionPlan ? {

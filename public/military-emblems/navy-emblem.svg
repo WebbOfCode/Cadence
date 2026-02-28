@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Navy Blue Circle -->
+  <circle cx="100" cy="100" r="95" fill="#003f7f" stroke="#fff" stroke-width="2"/>
+  
+  <!-- Anchor and Helm base -->
+  <g transform="translate(100, 100)">
+    <!-- Shield background -->
+    <path d="M -30,-40 L 30,-40 L 30,10 Q 0,35 -30,10 Z" fill="#FFD700" stroke="#fff" stroke-width="1"/>
+    
+    <!-- Anchor -->
+    <g transform="translate(0, -5)">
+      <!-- Anchor shaft -->
+      <line x1="0" y1="-10" x2="0" y2="15" stroke="#003f7f" stroke-width="2"/>
+      <!-- Anchor flukes -->
+      <path d="M -8,15 L -12,22 M 0,18 L 0,24 M 8,15 L 12,22" 
+            stroke="#003f7f" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- Anchor ring -->
+      <circle cx="0" cy="-10" r="4" fill="#003f7f"/>
+    </g>
+    
+    <!-- Rope elements -->
+    <path d="M -15,-35 Q -20,-30 -15,-20 M 15,-35 Q 20,-30 15,-20" 
+          stroke="#FFD700" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Navy Text -->
+  <text x="100" y="175" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#FFD700">U.S. NAVY</text>
+</svg>

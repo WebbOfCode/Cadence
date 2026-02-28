@@ -48,12 +48,16 @@ export async function POST(req: NextRequest) {
       salaryData,
     };
 
+    // Build O*NET URLs for reference
+    const onetUrls = onetCodes.map(code => `https://www.onetonline.org/link/summary/${code}`);
+
     const prompt = `You are a military transition career counselor. Analyze this service member's military occupational specialty and provide detailed civilian career guidance.
 
 MOS/AFSC/Rating/NEC: ${mos}
 Branch: ${inferredBranch}
 Location: ZIP ${zip}${stateMetro ? ` (${stateMetro.state}${stateMetro.metro ? ', ' + stateMetro.metro : ''})` : ''}
 O*NET SOC Codes: ${onetCodes.join(', ') || 'None mapped'}
+O*NET Career Explorer Links: ${onetUrls.join(', ')}
 ${salaryData ? `Local Salary Data: Median $${salaryData.median.toLocaleString()}, 25th percentile $${salaryData.p25.toLocaleString()}, 75th percentile $${salaryData.p75.toLocaleString()}` : ''}
 
 Provide a JSON response with the following structure:
@@ -63,7 +67,7 @@ Provide a JSON response with the following structure:
     {
       "title": "job title",
       "amount": salary_number,
-      "source": "data source description"
+      "source": "data source description (include O*NET when applicable)"
     }
   ],
   "skillGaps": ["array of 3-6 specific skills, certifications, or qualifications commonly missing"],
@@ -75,7 +79,14 @@ Provide a JSON response with the following structure:
       "provider": "provider name"
     }
   ],
-  "resumeBullets": ["array of 4-6 military-to-civilian translated resume bullet points using strong action verbs and quantified achievements"]
+  "resumeBullets": ["array of 4-6 military-to-civilian translated resume bullet points using strong action verbs and quantified achievements"],
+  "onetLinks": [
+    {
+      "code": "O*NET SOC code",
+      "title": "occupation title",
+      "url": "https://www.onetonline.org/link/summary/CODE"
+    }
+  ]
 }
 
 Guidelines:
@@ -86,6 +97,8 @@ Guidelines:
 - Resume bullets should translate military jargon to civilian terms
 - Consider the location's job market and cost of living
 - Be realistic about entry points vs. aspirational roles
+- Include O*NET Online occupation links in onetLinks array using the provided SOC codes
+- Reference https://www.onetonline.org/ as the authoritative source for occupation data
 
 Return ONLY valid JSON, no markdown formatting.`;
 

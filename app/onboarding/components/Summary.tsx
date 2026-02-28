@@ -1,10 +1,25 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useOnboardingStore } from '@/lib/useOnboardingStore';
 import { StepWrapper } from './StepWrapper';
 import { formatDate, getGoalLabel, getDaysUntilETS } from '@/lib/utils';
+import type { MilitaryBranch } from '@/lib/types';
+
+interface SummaryProps {
+  onBack: () => void;
+}
+
+const BRANCH_EMBLEMS: Record<MilitaryBranch, string> = {
+  "Army": "/military-emblems/army-emblem.svg",
+  "Navy": "/military-emblems/navy-emblem.svg",
+  "Air Force": "/military-emblems/airforce-emblem.svg",
+  "Marine Corps": "/military-emblems/marines-emblem.svg",
+  "Coast Guard": "/military-emblems/coastguard-emblem.svg",
+  "Space Force": "/military-emblems/spaceforce-emblem.svg",
+};
 
 interface SummaryProps {
   onBack: () => void;
@@ -113,7 +128,18 @@ export function Summary({ onBack }: SummaryProps) {
 
           <div>
             <p className="text-sm font-medium uppercase tracking-wide text-gray-500">Branch & MOS</p>
-            <p className="text-lg mt-1">{data.branch} • {data.mos}</p>
+            <div className="flex items-center gap-3 mt-1">
+              {data.branch && (
+                <Image
+                  src={BRANCH_EMBLEMS[data.branch as MilitaryBranch]}
+                  alt={data.branch}
+                  width={40}
+                  height={40}
+                  className="flex-shrink-0"
+                />
+              )}
+              <p className="text-lg">{data.branch} • {data.mos}</p>
+            </div>
           </div>
 
           {data.timeInService && (

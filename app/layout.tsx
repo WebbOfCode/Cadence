@@ -4,6 +4,7 @@ import '../styles/globals.css';
 import { Header } from '@/components/Header';
 import ThemeProvider from '@/components/ThemeProvider';
 import BugReportButton from '@/components/BugReportButton';
+import Footer from '@/components/Footer';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -53,11 +54,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.variable} suppressHydrationWarning>
+      <body className={`${inter.variable}`} suppressHydrationWarning>
         <ThemeProvider>
-          <Header />
-          {children}
-          <BugReportButton />
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1 flex flex-col">
+              {children}
+            </main>
+            <Footer />
+            <BugReportButton />
+          </div>
         </ThemeProvider>
       </body>
     </html>

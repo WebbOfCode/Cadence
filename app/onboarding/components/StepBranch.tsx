@@ -21,12 +21,12 @@ interface StepBranchProps {
 }
 
 const branchCards: { name: MilitaryBranch; logo: string; tagline: string }[] = [
-  { name: 'Army', logo: '/branch-logos/army.svg', tagline: 'Soldiers & Warrant Officers' },
-  { name: 'Navy', logo: '/branch-logos/navy.svg', tagline: 'Sailors & Chiefs' },
-  { name: 'Air Force', logo: '/branch-logos/air-force.svg', tagline: 'Airmen & Guardians-to-be' },
-  { name: 'Marine Corps', logo: '/branch-logos/marine-corps.svg', tagline: 'Marines & Veterans' },
-  { name: 'Coast Guard', logo: '/branch-logos/coast-guard.svg', tagline: 'Coasties & Reservists' },
-  { name: 'Space Force', logo: '/branch-logos/space-force.svg', tagline: 'Guardians' },
+  { name: 'Army', logo: '/military-emblems/army-emblem.svg', tagline: 'Soldiers & Warrant Officers' },
+  { name: 'Navy', logo: '/military-emblems/navy-emblem.svg', tagline: 'Sailors & Chiefs' },
+  { name: 'Air Force', logo: '/military-emblems/airforce-emblem.svg', tagline: 'Airmen & Guardians-to-be' },
+  { name: 'Marine Corps', logo: '/military-emblems/marines-emblem.svg', tagline: 'Marines & Veterans' },
+  { name: 'Coast Guard', logo: '/military-emblems/coastguard-emblem.svg', tagline: 'Coasties & Reservists' },
+  { name: 'Space Force', logo: '/military-emblems/spaceforce-emblem.svg', tagline: 'Guardians' },
 ];
 
 export function StepBranch({ onNext, onBack }: StepBranchProps) {

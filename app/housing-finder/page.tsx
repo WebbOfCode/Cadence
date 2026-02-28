@@ -78,14 +78,27 @@ export default function HousingFinderPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!resp.ok) throw new Error("Failed to search housing");
+      
+      if (!resp.ok) {
+        const errorData = await resp.json().catch(() => ({}));
+        throw new Error(errorData.error || `Server error: ${resp.status}`);
+      }
+      
       const json = await resp.json();
-      setResults(json.results || []);
-      if (json.results?.length === 0) {
+      
+      if (!json.results || !Array.isArray(json.results)) {
+        throw new Error("Invalid response format from server");
+      }
+      
+      setResults(json.results);
+      if (json.results.length === 0) {
         setError("No listings found matching your criteria. Try adjusting your filters.");
       }
     } catch (e: any) {
-      setError(e.message ?? "Unknown error");
+      const errorMessage = e instanceof Error ? e.message : "Unknown error occurred";
+      console.error("Housing search failed:", errorMessage);
+      setError(errorMessage);
+      setResults([]);
     } finally {
       setLoading(false);
     }
@@ -95,18 +108,30 @@ export default function HousingFinderPage() {
   useEffect(() => {
     const searchDefault = async () => {
       setLoading(true);
+      setError(null);
       try {
         const resp = await fetch("/api/housing", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ location: "Nashville, TN" }),
         });
-        if (resp.ok) {
-          const json = await resp.json();
-          setResults(json.results || []);
+        
+        if (!resp.ok) {
+          throw new Error(`Server returned ${resp.status}`);
+        }
+        
+        const json = await resp.json();
+        
+        if (json.results && Array.isArray(json.results)) {
+          setResults(json.results);
+        } else {
+          console.warn("Invalid response format:", json);
+          setError("Failed to load housing listings");
         }
       } catch (e) {
-        console.error("Failed to load default housing search", e);
+        const errorMessage = e instanceof Error ? e.message : "Unknown error";
+        console.error("Failed to load default housing search:", errorMessage);
+        setError("Failed to load housing listings. Please try searching manually.");
       } finally {
         setLoading(false);
       }

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Air Force Blue Circle -->
+  <circle cx="100" cy="100" r="95" fill="#00205B" stroke="#FFD700" stroke-width="2"/>
+  
+  <!-- Winged Insignia -->
+  <g transform="translate(100, 100)">
+    <!-- Central shield -->
+    <circle cx="0" cy="0" r="25" fill="#FFD700" stroke="#00205B" stroke-width="2"/>
+    
+    <!-- Left Wing -->
+    <path d="M -25,-5 Q -50,-20 -55,-10 Q -50,0 -25,5 Z" 
+          fill="#FFD700" stroke="#00205B" stroke-width="1.5"/>
+    
+    <!-- Right Wing -->
+    <path d="M 25,-5 Q 50,-20 55,-10 Q 50,0 25,5 Z" 
+          fill="#FFD700" stroke="#00205B" stroke-width="1.5"/>
+    
+    <!-- Center Star -->
+    <path d="M 0,-12 L 3,-3 L 12,-3 L 5,3 L 8,12 L 0,6 L -8,12 L -5,3 L -12,-3 L -3,-3 Z" 
+          fill="#00205B"/>
+  </g>
+  
+  <!-- Air Force Text -->
+  <text x="100" y="175" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#FFD700">U.S. AIR FORCE</text>
+</svg>

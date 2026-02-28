@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Marine Corps Red Circle -->
+  <circle cx="100" cy="100" r="95" fill="#B22234" stroke="#000" stroke-width="2"/>
+  
+  <!-- Eagle, Globe and Anchor base -->
+  <g transform="translate(100, 100)">
+    <!-- Globe -->
+    <circle cx="0" cy="5" r="35" fill="none" stroke="#FFD700" stroke-width="2"/>
+    <ellipse cx="0" cy="5" rx="35" ry="12" fill="none" stroke="#FFD700" stroke-width="1"/>
+    
+    <!-- Anchor -->
+    <g>
+      <!-- Anchor shaft -->
+      <line x1="0" y1="5" x2="0" y2="45" stroke="#FFD700" stroke-width="3"/>
+      <!-- Anchor flukes -->
+      <path d="M -15,45 Q -20,52 -15,58 M 0,55 L 0,62 M 15,45 Q 20,52 15,58" 
+            stroke="#FFD700" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </g>
+    
+    <!-- Eagle wings outline -->
+    <path d="M -40,-15 Q -50,-25 -45,-35 M 40,-15 Q 50,-25 45,-35" 
+          stroke="#FFD700" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Marine Corps Text -->
+  <text x="100" y="175" font-family="Arial, sans-serif" font-size="13" font-weight="bold" text-anchor="middle" fill="#FFD700">U.S. MARINE CORPS</text>
+</svg>
