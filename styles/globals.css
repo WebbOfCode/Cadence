@@ -504,6 +504,19 @@
   @apply text-black;
 }
 
+/* Active state for current page */
+.nav-link-active {
+  @apply border-current bg-black/10;
+}
+
+.site-header.dark-mode .nav-link-active {
+  @apply bg-white/20 border-white/60;
+}
+
+.site-header.scrolled .nav-link-active {
+  @apply bg-black/10 border-black/40;
+}
+
 /* Subtle dashboard texture */
 .dashboard-bg {
   background-color: #fafafa;

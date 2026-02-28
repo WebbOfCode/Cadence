@@ -43,6 +43,9 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasHeroSection]);
 
+  const navLinkClass = (path: string) =>
+    `nav-link text-xs md:text-sm px-2 md:px-3 py-1 md:py-1.5${pathname === path ? ' nav-link-active' : ''}`;
+
   const handleReset = () => {
     if (confirm('Are you sure? This will clear your mission plan and return to onboarding.')) {
       reset();
@@ -69,31 +72,31 @@ export function Header() {
         <nav className="hidden lg:flex gap-2 flex-shrink-0">
           <button
             onClick={() => router.push('/dashboard')}
-            className="nav-link text-xs md:text-sm px-2 md:px-3 py-1 md:py-1.5"
+            className={navLinkClass('/dashboard')}
           >
             Mission Plans
           </button>
           <button
             onClick={() => router.push('/benefits-scanner')}
-            className="nav-link text-xs md:text-sm px-2 md:px-3 py-1 md:py-1.5"
+            className={navLinkClass('/benefits-scanner')}
           >
             Benefits
           </button>
           <button
             onClick={() => router.push('/housing-finder')}
-            className="nav-link text-xs md:text-sm px-2 md:px-3 py-1 md:py-1.5"
+            className={navLinkClass('/housing-finder')}
           >
             Housing
           </button>
           <button
             onClick={() => router.push('/support-groups')}
-            className="nav-link text-xs md:text-sm px-2 md:px-3 py-1 md:py-1.5"
+            className={navLinkClass('/support-groups')}
           >
             Support
           </button>
           <button
             onClick={() => router.push('/mos-translator')}
-            className="nav-link text-xs md:text-sm px-2 md:px-3 py-1 md:py-1.5"
+            className={navLinkClass('/mos-translator')}
           >
             MOS
           </button>
@@ -102,7 +105,7 @@ export function Header() {
         {/* Right section - Branch switcher and CTA */}
         <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
           <div className="hidden sm:block">
-            <BranchSwitcher />
+            <BranchSwitcher compact />
           </div>
           {missionPlan ? (
             <button
