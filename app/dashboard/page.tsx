@@ -217,6 +217,10 @@ export default function DashboardPage() {
     );
   }
 
+  if (!missionPlan) {
+    return null;
+  }
+
   // Define helper functions before they're used in calculations
   const daysBetween = (futureDate: Date, startDate: Date) => {
     return Math.ceil((futureDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -456,7 +460,7 @@ export default function DashboardPage() {
         // Task details
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Priority: ${task.priority.toUpperCase()} | Category: ${getCategoryLabel(task.category)}${task.core ? ' | CORE TASK' : ''}`, 25, yPos);
+        doc.text(`Priority: ${task.priority.toUpperCase()} | Category: ${categoryLabels[task.category]}${task.core ? ' | CORE TASK' : ''}`, 25, yPos);
         yPos += 5;
         
         if (task.deadline) {
@@ -530,6 +534,14 @@ export default function DashboardPage() {
       percent,
     };
   }).filter((entry) => entry.total > 0);
+
+  const goalDetailSelections = data.goalDetails
+    ? Object.values(data.goalDetails).flatMap((value): string[] => {
+      if (!value) return [];
+      if (Array.isArray(value)) return value.map((item) => String(item));
+      return [String(value)];
+    })
+    : [];
 
   const lastSavedAt = data.lastSavedAt ? new Date(data.lastSavedAt) : null;
 
@@ -911,7 +923,7 @@ export default function DashboardPage() {
                 .filter((t) => t.completed)
                 .map((t) => t.id) || [],
               currentGoals: data.goal ? [data.goal] : [],
-              blockers: data.goalDetails ? [data.goalDetails] : [],
+              blockers: goalDetailSelections,
             }}
             context={`Veteran is ${daysUntilETS} days from ETS. Primary goal: ${data.goal}. ${missionPlan?.tasks.length || 0} tasks in mission plan.`}
           />
@@ -1189,7 +1201,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="px-2 py-1 text-xs font-semibold rounded-full border border-gray-200 bg-white text-gray-700 flex items-center gap-1">
-                              <CategoryIcon size={14} />
+                              <CategoryIcon className="w-3.5 h-3.5" />
                               {categoryLabels[task.category]}
                             </span>
                             <span className={`px-3 py-1 text-xs font-bold uppercase rounded-full ${priorityTone}`}>

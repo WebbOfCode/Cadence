@@ -125,9 +125,9 @@ export function StepGoal({ onNext, onBack }: StepGoalProps) {
     updateData({ 
       goal: formData.goal,
       goalDetails: {
-        careerPath: formData.careerPath,
-        educationPath: formData.educationPath,
-        housingPath: formData.housingPath,
+        careerPath: formData.careerPath ?? undefined,
+        educationPath: formData.educationPath ?? undefined,
+        housingPath: formData.housingPath ?? undefined,
         financePath: formData.financePath && formData.financePath.length > 0 ? formData.financePath : undefined,
         wellnessPath: formData.wellnessPath && formData.wellnessPath.length > 0 ? formData.wellnessPath : undefined,
       },
