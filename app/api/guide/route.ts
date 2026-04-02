@@ -6,19 +6,17 @@ import type { MissionPlan, MissionTask } from '@/lib/types';
 
 export async function POST(req: NextRequest) {
   try {
-    // Check if API key is configured
-    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
-      console.error('OPENAI_API_KEY is not configured');
+    // Mission plans use a dedicated API key
+    const apiKey = process.env.OPENAI_MISSION_API_KEY || process.env.OPENAI_API_KEY;
+    if (!apiKey || apiKey === 'your_openai_api_key_here') {
+      console.error('OPENAI_MISSION_API_KEY is not configured');
       return NextResponse.json(
-        { error: 'OpenAI API key is not configured. Please add a valid API key to .env.local' },
+        { error: 'OpenAI API key for mission plans is not configured. Please add OPENAI_MISSION_API_KEY to .env.local' },
         { status: 500 }
       );
     }
 
-    // Initialize OpenAI client with validated API key
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const openai = new OpenAI({ apiKey });
 
     const body = await req.json();
     

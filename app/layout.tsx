@@ -1,15 +1,23 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import '../styles/globals.css';
 import { Header } from '@/components/Header';
 import ThemeProvider from '@/components/ThemeProvider';
 import BugReportButton from '@/components/BugReportButton';
 import Footer from '@/components/Footer';
+import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
 });
+
+export const viewport: Viewport = {
+  themeColor: '#000000',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   title: 'Cadence - Veteran Transition Tool | Veteran-Founded & Disability-Informed',
@@ -19,6 +27,25 @@ export const metadata: Metadata = {
   creator: 'Cadence Veteran Transition Tool',
   publisher: 'Cadence',
   robots: 'index, follow',
+  manifest: '/manifest.json',
+  themeColor: '#000000',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Cadence',
+  },
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
+  icons: {
+    icon: [
+      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -63,6 +90,7 @@ export default function RootLayout({
             </main>
             <Footer />
             <BugReportButton />
+            <ServiceWorkerRegister />
           </div>
         </ThemeProvider>
       </body>

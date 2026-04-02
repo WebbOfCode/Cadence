@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -60,7 +60,7 @@ export default function HousingFinderPage() {
   } = useForm<HousingForm>({
     resolver: zodResolver(HousingSchema),
     defaultValues: {
-      location: "Nashville, TN",
+      location: "New York, NY",
       maxRent: undefined,
       beds: undefined,
       pets: false,
@@ -92,7 +92,7 @@ export default function HousingFinderPage() {
       
       setResults(json.results);
       if (json.results.length === 0) {
-        setError("No listings found matching your criteria. Try adjusting your filters.");
+        setError("No listings found for that location. Check the location name and try again.");
       }
     } catch (e: any) {
       const errorMessage = e instanceof Error ? e.message : "Unknown error occurred";
@@ -104,41 +104,6 @@ export default function HousingFinderPage() {
     }
   };
 
-  // Auto-load default search on mount
-  useEffect(() => {
-    const searchDefault = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const resp = await fetch("/api/housing", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ location: "Nashville, TN" }),
-        });
-        
-        if (!resp.ok) {
-          throw new Error(`Server returned ${resp.status}`);
-        }
-        
-        const json = await resp.json();
-        
-        if (json.results && Array.isArray(json.results)) {
-          setResults(json.results);
-        } else {
-          console.warn("Invalid response format:", json);
-          setError("Failed to load housing listings");
-        }
-      } catch (e) {
-        const errorMessage = e instanceof Error ? e.message : "Unknown error";
-        console.error("Failed to load default housing search:", errorMessage);
-        setError("Failed to load housing listings. Please try searching manually.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    searchDefault();
-  }, []);
 
   return (
     <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-12">
@@ -165,9 +130,10 @@ export default function HousingFinderPage() {
             <label className="block text-sm font-medium text-gray-900 mb-2">City / State / ZIP</label>
             <input
               className="w-full border-2 border-gray-300 rounded-md px-3 py-2.5 text-gray-900 focus:ring-2 focus:ring-gray-900 focus:border-gray-900"
-              placeholder="e.g., Nashville, TN or 37211"
+              placeholder="e.g., San Francisco, CA or 90210"
               {...register("location")}
             />
+            <p className="text-xs text-gray-500 mt-1.5">Search any US city, state, or ZIP code</p>
             {errors.location && (
               <p className="text-xs text-red-700 mt-2">{errors.location.message}</p>
             )}
