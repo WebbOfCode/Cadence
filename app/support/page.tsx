@@ -194,6 +194,7 @@ export default function SupportPage() {
                     // Accordion rendering for "Getting Help with Cadence"
                     if (section.isAccordion) {
                       const isExpanded = expandedCadenceCards.has(itemIdx);
+                      const accordionItem = item as { label: string; shortDescription: string; fullDescription: string };
                       return (
                         <motion.button
                           key={itemIdx}
@@ -203,9 +204,9 @@ export default function SupportPage() {
                         >
                           <div className="flex items-center justify-between gap-3">
                             <div className="flex-1">
-                              <h3 className="font-semibold text-black">{item.label}</h3>
+                              <h3 className="font-semibold text-black">{accordionItem.label}</h3>
                               {!isExpanded && (
-                                <p className="text-sm text-gray-600 mt-1">{item.shortDescription}</p>
+                                <p className="text-sm text-gray-600 mt-1">{accordionItem.shortDescription}</p>
                               )}
                             </div>
                             <ChevronDown
@@ -220,7 +221,7 @@ export default function SupportPage() {
                               exit={{ opacity: 0, height: 0 }}
                               className="mt-4 pt-4 border-t border-gray-200"
                             >
-                              <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{item.fullDescription}</p>
+                              <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{accordionItem.fullDescription}</p>
                             </motion.div>
                           )}
                         </motion.button>
@@ -228,14 +229,15 @@ export default function SupportPage() {
                     }
 
                     // Static card rendering for other sections
+                    const staticItem = item as { label: string; description: string };
                     return (
                       <motion.div
                         key={itemIdx}
                         variants={itemVariants}
                         className="p-4 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all"
                       >
-                        <h3 className="font-semibold text-black mb-2">{item.label}</h3>
-                        <p className="text-sm text-gray-700">{item.description}</p>
+                        <h3 className="font-semibold text-black mb-2">{staticItem.label}</h3>
+                        <p className="text-sm text-gray-700">{staticItem.description}</p>
                       </motion.div>
                     );
                   })}
