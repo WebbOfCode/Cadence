@@ -36,7 +36,6 @@ export default function Footer() {
                 src="https://hitwebcounter.com/counter/counter.php?page=21486814&style=0005&nbdigits=5&type=page&initCount=0"
                 title="Free Tools"
                 alt="Free Tools"
-                border="0"
               />
             </a>
           </div>
