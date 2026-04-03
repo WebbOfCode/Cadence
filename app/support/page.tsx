@@ -1,32 +1,50 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MessageSquare, AlertTriangle, BookOpen, Phone, Globe, Users, Mail, HelpCircle } from 'lucide-react';
+import { MessageSquare, AlertTriangle, BookOpen, Phone, Globe, Users, Mail, HelpCircle, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SupportPage() {
+  const [expandedCadenceCards, setExpandedCadenceCards] = useState<Set<number>>(new Set());
+
+  const toggleCadenceCard = (itemIdx: number) => {
+    const newExpanded = new Set(expandedCadenceCards);
+    if (newExpanded.has(itemIdx)) {
+      newExpanded.delete(itemIdx);
+    } else {
+      newExpanded.add(itemIdx);
+    }
+    setExpandedCadenceCards(newExpanded);
+  };
+
   const supportSections = [
     {
       title: 'Getting Help With Cadence',
       icon: MessageSquare,
+      isAccordion: true,
       items: [
         {
           label: 'Dashboard Guide',
-          description: 'Learn how to use your mission control dashboard, track tasks, and manage your transition plan.',
+          shortDescription: 'Learn how to navigate your mission control center',
+          fullDescription: 'Your Dashboard is your mission control center for your transition. After onboarding, start here to:\n\n• Navigate between Mission Plans, Benefits, Housing, and MOS sections\n• View and track your transition goals and deadlines\n• Monitor task completion and overall transition progress\n• Access your personalized transition plan recommendations\n\nThe dashboard shows your current phase of transition and highlights critical next steps. Use the sidebar to move between sections and the progress indicators to track your journey.',
         },
         {
           label: 'Transition Planning',
-          description: 'Understand how Cadence generates your personalized transition plan and interprets the recommendations.',
+          shortDescription: 'Understand how Cadence builds your mission plan',
+          fullDescription: 'Cadence creates a personalized transition plan based on your military background, goals, and timeline:\n\n• Build a Mission Plan: Define your civilian transition goals and set realistic deadlines\n• Set Priorities: Focus on what matters most—career, education, housing, or benefits\n• Track Progress: Monitor completed tasks and adjust your plan as needed\n• Structured Steps: Cadence recommends structured civilian transition steps based on your profile\n\nYour plan adapts as you complete tasks. Review and update it regularly to stay on track.',
         },
         {
           label: 'Account & Settings',
-          description: 'Edit your profile, change your transition goals, and manage your personal information securely.',
+          shortDescription: 'Manage your profile and preferences',
+          fullDescription: '⚠️ This feature is currently a work in progress.\n\nFuture features will include:\n\n• Profile Management: Edit your service information, branch, MOS, and ETS date\n• Transition Goals: Update your career and life transition goals anytime\n• Preferences: Customize notifications and communication preferences\n• Saved Progress: Store and resume your transition plan across sessions\n• Data Security: Manage how your information is stored and used\n\nWe\'re actively developing these features to give you full control over your transition data.',
         },
       ],
     },
     {
       title: 'Security & Private Data',
       icon: AlertTriangle,
+      isAccordion: false,
       items: [
         {
           label: 'Never Share Sensitive Information',
@@ -43,26 +61,9 @@ export default function SupportPage() {
       ],
     },
     {
-      title: 'Finding Local Resources',
-      icon: Users,
-      items: [
-        {
-          label: 'Support Groups & Services',
-          description: 'Use our "Support Groups" tab at the top to find VA Vet Centers, Benefits Offices, and community resources by ZIP code.',
-        },
-        {
-          label: 'VA Medical Centers',
-          description: 'Locate your nearest VA Medical Center, VA benefits office, and Vet Center for healthcare and support services.',
-        },
-        {
-          label: 'Veteran Service Organizations',
-          description: 'Connect with VSOs like DAV, VFW, and American Legion who can help with benefits claims and document review.',
-        },
-      ],
-    },
-    {
       title: 'Benefits & Eligibility',
       icon: Globe,
+      isAccordion: false,
       items: [
         {
           label: 'Understanding Your Eligibility',
@@ -81,6 +82,7 @@ export default function SupportPage() {
     {
       title: 'Career & Education',
       icon: BookOpen,
+      isAccordion: false,
       items: [
         {
           label: 'Military to Civilian Translation',
@@ -99,6 +101,7 @@ export default function SupportPage() {
     {
       title: 'Crisis Support',
       icon: Phone,
+      isAccordion: false,
       items: [
         {
           label: 'Veterans Crisis Line',
@@ -187,12 +190,55 @@ export default function SupportPage() {
                 </div>
 
                 <div className="space-y-4">
-                  {section.items.map((item, itemIdx) => (
-                    <div key={itemIdx} className="p-4 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all">
-                      <h3 className="font-semibold text-black mb-2">{item.label}</h3>
-                      <p className="text-sm text-gray-700">{item.description}</p>
-                    </div>
-                  ))}
+                  {section.items.map((item, itemIdx) => {
+                    // Accordion rendering for "Getting Help with Cadence"
+                    if (section.isAccordion) {
+                      const isExpanded = expandedCadenceCards.has(itemIdx);
+                      return (
+                        <motion.button
+                          key={itemIdx}
+                          variants={itemVariants}
+                          onClick={() => toggleCadenceCard(itemIdx)}
+                          className="w-full text-left p-4 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-black">{item.label}</h3>
+                              {!isExpanded && (
+                                <p className="text-sm text-gray-600 mt-1">{item.shortDescription}</p>
+                              )}
+                            </div>
+                            <ChevronDown
+                              size={20}
+                              className={`text-black flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                            />
+                          </div>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="mt-4 pt-4 border-t border-gray-200"
+                            >
+                              <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{item.fullDescription}</p>
+                            </motion.div>
+                          )}
+                        </motion.button>
+                      );
+                    }
+
+                    // Static card rendering for other sections
+                    return (
+                      <motion.div
+                        key={itemIdx}
+                        variants={itemVariants}
+                        className="p-4 rounded-lg border border-gray-200 hover:border-black hover:shadow-md transition-all"
+                      >
+                        <h3 className="font-semibold text-black mb-2">{item.label}</h3>
+                        <p className="text-sm text-gray-700">{item.description}</p>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </motion.div>
             );
@@ -267,51 +313,11 @@ export default function SupportPage() {
         </motion.div>
       </motion.div>
 
-      {/* Critical Information Banner */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="max-w-6xl mx-auto px-4 md:px-6 py-12"
-      >
-        <div className="p-8 rounded-xl bg-red-50 border-2 border-red-300">
-          <div className="flex gap-4">
-            <AlertTriangle className="w-8 h-8 text-red-700 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="text-xl font-bold text-red-900 mb-3">Never Share Sensitive Information</h3>
-              <p className="text-red-800 mb-4">
-                Do NOT enter or share the following information anywhere on Cadence or any unfamiliar website:
-              </p>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-red-800 mb-4">
-                {[
-                  'Social Security Number (SSN)',
-                  'Bank account or routing numbers',
-                  'Credit card information',
-                  'Date of birth',
-                  'Military ID number',
-                  'Passwords or PINs',
-                  'Biometric data',
-                  'Medical record numbers',
-                ].map((item, idx) => (
-                  <div key={idx} className="flex gap-2">
-                    <span className="font-bold">•</span>
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </ul>
-              <p className="text-red-800 font-semibold">
-                Cadence stores only your name, branch, MOS, ETS date, and transition goals. We never ask for or store sensitive financial or medical data.
-              </p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
       {/* Contact Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.3 }}
         className="max-w-6xl mx-auto px-4 md:px-6 py-12 border-t border-gray-200"
       >
         <h2 className="text-2xl font-bold text-black mb-8">Contact Us</h2>
@@ -340,25 +346,7 @@ export default function SupportPage() {
         </div>
       </motion.div>
 
-      {/* Footer Links */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="max-w-6xl mx-auto px-4 md:px-6 py-8 border-t border-gray-200"
-      >
-        <div className="flex flex-wrap gap-6 text-sm">
-          <Link href="/privacy" className="text-black font-semibold hover:underline">
-            Privacy Policy
-          </Link>
-          <Link href="/terms" className="text-black font-semibold hover:underline">
-            Terms of Service
-          </Link>
-          <Link href="/dashboard" className="text-black font-semibold hover:underline">
-            Back to Dashboard
-          </Link>
-        </div>
-      </motion.div>
+
     </div>
   );
 }

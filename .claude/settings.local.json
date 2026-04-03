@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(node scripts/generate-icons.js)"
+    ]
+  }
+}

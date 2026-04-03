@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import '../styles/globals.css';
 import { Header } from '@/components/Header';
 import ThemeProvider from '@/components/ThemeProvider';
 import BugReportButton from '@/components/BugReportButton';
 import Footer from '@/components/Footer';
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
+import { ScrollReset } from '@/components/ScrollReset';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -83,6 +85,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable}`} suppressHydrationWarning>
         <ThemeProvider>
+          <ScrollReset />
           <div className="min-h-screen flex flex-col">
             <Header />
             <main className="flex-1 flex flex-col">
@@ -93,6 +96,7 @@ export default function RootLayout({
             <ServiceWorkerRegister />
           </div>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );

@@ -16,21 +16,22 @@ export default function SupportGroupsPage() {
   const [loading, setLoading] = useState(false);
   const [resources, setResources] = useState<SupportResource[]>([]);
   const [stateCode, setStateCode] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
   const validZip = useMemo(() => /^\d{5}$/.test(zip), [zip]);
 
   useEffect(() => {
-    // Hydrate from localStorage
+    // Hydrate ZIP from localStorage (for convenience, but don't auto-search)
     if (typeof window === 'undefined') return;
     const stored = localStorage.getItem('cadence-zip') || '';
     if (stored && /^\d{5}$/.test(stored)) {
       setZip(stored);
-      void findResources(stored);
     }
   }, []);
 
   const findResources = async (z: string) => {
     if (!/^\d{5}$/.test(z)) return;
     setLoading(true);
+    setHasSearched(true);
     try {
       const res = await fetch(`/api/support-groups?zip=${encodeURIComponent(z)}`);
       if (!res.ok) throw new Error('Failed to fetch resources');
@@ -89,43 +90,57 @@ export default function SupportGroupsPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {resources.map((r, idx) => (
-            <motion.a
-              key={`${r.type}-${idx}`}
-              href={r.url}
-              target="_blank"
-              rel="noreferrer"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 * idx }}
-              className="block p-6 border-2 border-gray-200 rounded-xl hover:border-black transition-all bg-white"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <div className="h-9 w-9 rounded-lg bg-black text-white flex items-center justify-center">
-                  {r.type === 'VA Vet Center' && <HeartHandshake size={18} />}
-                  {r.type === 'VA Medical Center' && <Building2 size={18} />}
-                  {r.type === 'VA Benefits Office' && <Shield size={18} />}
-                  {r.type === 'VSO' && <Shield size={18} />}
-                  {r.type === 'Community' && <HeartHandshake size={18} />}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">{r.type}</p>
-                  <h3 className="text-lg font-bold text-gray-900">{r.name}</h3>
-                </div>
-              </div>
-              {r.description && (
-                <p className="text-sm text-gray-600">{r.description}</p>
-              )}
-              <p className="text-sm font-medium text-blue-700 mt-3">Open locator</p>
-            </motion.a>
-          ))}
-        </div>
+        {hasSearched && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {resources.map((r, idx) => (
+                <motion.div
+                  key={`${r.type}-${idx}`}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * idx }}
+                  className="border-2 border-gray-200 rounded-xl bg-white overflow-hidden hover:border-black hover:shadow-lg transition-all p-6"
+                >
+                  <div className="flex h-full flex-col gap-4">
+                    <div className="flex items-start gap-3">
+                      <div className="h-9 w-9 rounded-lg bg-black text-white flex items-center justify-center flex-shrink-0 mt-1">
+                        {r.type === 'VA Vet Center' && <HeartHandshake size={18} />}
+                        {r.type === 'VA Medical Center' && <Building2 size={18} />}
+                        {r.type === 'VA Benefits Office' && <Shield size={18} />}
+                        {r.type === 'VSO' && <Shield size={18} />}
+                        {r.type === 'Community' && <HeartHandshake size={18} />}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">{r.type}</p>
+                        <h3 className="text-lg font-bold text-gray-900">{r.name}</h3>
+                      </div>
+                    </div>
 
-        {resources.length === 0 && !loading && (
-          <div className="text-center text-gray-600 mt-8">
-            Enter your ZIP to see nearby support resources.
-          </div>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {r.description || 'View this resource to learn more and access the locator.'}
+                    </p>
+
+                    <div className="pt-1">
+                      <a
+                        href={r.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center justify-center rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+                      >
+                        Open locator
+                      </a>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {resources.length === 0 && !loading && (
+              <div className="text-center text-gray-600 mt-8">
+                No resources found for that ZIP code. Try a different one.
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
