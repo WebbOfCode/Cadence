@@ -39,6 +39,9 @@ export default function Footer() {
               />
             </a>
           </div>
+          <div className="text-center border-t border-white/10 pt-4">
+            <p className="text-sm text-gray-400">Need a site built? <a href="mailto:help@demarickwebb.dev" className="hover:text-white transition-colors font-semibold">Holler at help@demarickwebb.dev</a></p>
+          </div>
         </div>
       </div>
     </footer>
